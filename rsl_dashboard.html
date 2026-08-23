@@ -1,0 +1,3468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Analítico de la RSL - Q1/Q2 Grade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #151c2c;
+            --border-color: #222e45;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #ec4899;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-blue: #3b82f6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: rgba(0,0,0,0);
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+            font-size: 1rem;
+        }
+
+        .file-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.03);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title span {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        
+        /* KPI Grid */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .kpi-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+        
+        .kpi-card.purple::before { background: var(--accent-primary); }
+        .kpi-card.pink::before { background: var(--accent-secondary); }
+        .kpi-card.teal::before { background: var(--accent-teal); }
+        .kpi-card.amber::before { background: var(--accent-amber); }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        .kpi-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .kpi-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        
+        .kpi-footer {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Charts Grid */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .chart-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .col-12 { grid-column: span 12; }
+        .col-6 { grid-column: span 6; }
+        
+        @media (max-width: 1024px) {
+            .col-6 { grid-column: span 12; }
+        }
+        
+        .chart-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-title .title-text {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-title .badge-q {
+            font-size: 0.7rem;
+            background: rgba(20, 184, 166, 0.1);
+            color: var(--accent-teal);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .plotly-chart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        /* Article Table Section */
+        .table-section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            margin-top: 3rem;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .search-container {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+        
+        .search-input {
+            width: 100%;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: var(--accent-primary);
+            background-color: rgba(255,255,255,0.08);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        
+        th {
+            background-color: rgba(255,255,255,0.03);
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 0.8rem 1rem;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid var(--border-color);
+            z-index: 10;
+        }
+        
+        td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        tr:hover {
+            background-color: rgba(255,255,255,0.01);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-year {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .badge-citations {
+            background-color: rgba(236, 72, 153, 0.15);
+            color: #f472b6;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+
+        .article-title {
+            font-weight: 500;
+            color: var(--text-main);
+            max-width: 450px;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        .article-authors {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>Dashboard de RSL (Nivel Q1/Q2)</h1>
+            <div class="subtitle">Análisis Estructural, Redes Temáticas y Colaboración Científica</div>
+        </div>
+        <div class="file-info">
+            Origen: <strong>ARTICULOS_UNIFICADOS_CRIBADO.xlsx</strong>
+        </div>
+    </header>
+
+    <!-- KPI Row -->
+    <div class="kpi-container">
+        <div class="kpi-card purple">
+            <div class="kpi-title">Total Artículos</div>
+            <div class="kpi-value" id="kpi-total-articles">-</div>
+            <div class="kpi-footer">
+                <span>Rango: <strong id="kpi-years-range">-</strong></span>
+            </div>
+        </div>
+        <div class="kpi-card pink">
+            <div class="kpi-title">Total Citas</div>
+            <div class="kpi-value" id="kpi-total-citations">-</div>
+            <div class="kpi-footer">
+                <span>Promedio: <strong id="kpi-avg-citations">-</strong> por paper</span>
+            </div>
+        </div>
+        <div class="kpi-card teal">
+            <div class="kpi-title">Coautoría Internacional</div>
+            <div class="kpi-value" id="kpi-collab-rate">-</div>
+            <div class="kpi-footer">
+                <span>Tasa de colaboración MCP</span>
+            </div>
+        </div>
+        <div class="kpi-card amber">
+            <div class="kpi-title">País Más Productivo</div>
+            <div class="kpi-value" id="kpi-top-country" style="font-size: 1.6rem; padding-top: 0.4rem;">-</div>
+            <div class="kpi-footer">
+                <span>Líder en publicaciones</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 1: PRODUCCIÓN E IMPACTO ESTRUCTURAL -->
+    <div class="section-title">
+        <span>Sección 1</span> Producción e Impacto Estructural de la Literatura
+    </div>
+    
+    <div class="charts-container">
+        <div class="chart-card col-12">
+            <div class="chart-title">
+                <div class="title-text">
+                    <span>1. Evolución Temporal de Producción e Impacto de Citas</span>
+                    <span class="badge-q">Descriptivo Clave</span>
+                </div>
+                <span class="subtitle" style="font-size: 0.8rem;">Volumen de artículos publicados vs promedio anual de citación</span>
+            </div>
+            <div id="chart-temporal" class="plotly-chart"></div>
+        </div>
+
+        <div class="chart-card col-6">
+            <div class="chart-title">
+                <div class="title-text">
+                    <span>2. Ley de Bradford: Zonas de Publicación</span>
+                    <span class="badge-q">Q1/Q2 Estructural</span>
+                </div>
+                <span class="subtitle" style="font-size: 0.8rem;">Distribución acumulada en revistas. Las líneas punteadas muestran límites de Zona 1 y 2</span>
+            </div>
+            <div id="chart-bradford" class="plotly-chart"></div>
+        </div>
+
+        <div class="chart-card col-6">
+            <div class="chart-title">
+                <div class="title-text">
+                    <span>3. Colaboración Internacional de Países (SCP vs MCP)</span>
+                    <span class="badge-q">Q1/Q2 Colaboración</span>
+                </div>
+                <span class="subtitle" style="font-size: 0.8rem;">Top 10 Países ordenados por productividad. Compara artículos nacionales vs internacionales</span>
+            </div>
+            <div id="chart-countries" class="plotly-chart"></div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: ESTRUCTURA CONCEPTUAL Y TEMAS -->
+    <div class="section-title">
+        <span>Sección 2</span> Estructura Conceptual y Mapa Estratégico de Temas
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-card col-6">
+            <div class="chart-title">
+                <div class="title-text">
+                    <span>4. Análisis Temático: Distribución de Palabras Clave (Treemap)</span>
+                    <span class="badge-q">Descriptivo Temático</span>
+                </div>
+                <span class="subtitle" style="font-size: 0.8rem;">Proporción y volumen de las 12 palabras clave del autor más dominantes</span>
+            </div>
+            <div id="chart-treemap" class="plotly-chart"></div>
+        </div>
+
+        <div class="chart-card col-6">
+            <div class="chart-title">
+                <div class="title-text">
+                    <span>5. Mapa Temático: Clasificación de Temas (Centralidad vs Densidad)</span>
+                    <span class="badge-q">Q1/Q2 Estratégico</span>
+                </div>
+                <span class="subtitle" style="font-size: 0.8rem;">Clasificación de palabras clave en los 4 cuadrantes estratégicos de Callon</span>
+            </div>
+            <div id="chart-thematic" class="plotly-chart"></div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: DIAGRAMA DE TRES CAMPOS -->
+    <div class="section-title">
+        <span>Sección 3</span> Diagrama de Tres Campos (Three-Fields Plot)
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-card col-12">
+            <div class="chart-title">
+                <div class="title-text">
+                    <span>6. Flujo de Investigación: Países ➔ Palabras Clave ➔ Revistas</span>
+                    <span class="badge-q">Q1/Q2 Integrador</span>
+                </div>
+                <span class="subtitle" style="font-size: 0.8rem;">Muestra visualmente la interacción entre países de origen, temas estudiados y revistas publicadas</span>
+            </div>
+            <div id="chart-sankey" class="plotly-chart" style="height: 500px;"></div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-section">
+        <div class="table-header">
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 600;">Listado de Artículos Analizados</h2>
+            <div class="search-container">
+                <input type="text" id="table-search" class="search-input" placeholder="Buscar por título, autor o palabra clave...">
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Título</th>
+                        <th>Autores</th>
+                        <th>Revista / Origen</th>
+                        <th style="width: 80px; text-align: center;">Año</th>
+                        <th style="width: 80px; text-align: center;">Citas</th>
+                    </tr>
+                </thead>
+                <tbody id="articles-table-body">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Inject Data
+        const rslData = {
+    "kpis": {
+        "totalArticles": 149,
+        "yearsRange": "2024 - 2026",
+        "totalCitations": 990,
+        "avgCitations": 6.64,
+        "collaborationRate": "35.6%",
+        "topCountry": "CHINA"
+    },
+    "temporal": [
+        {
+            "PY": 2024,
+            "Articulos": 12,
+            "Promedio_Citas": 42.333333333333336
+        },
+        {
+            "PY": 2025,
+            "Articulos": 65,
+            "Promedio_Citas": 5.969230769230769
+        },
+        {
+            "PY": 2026,
+            "Articulos": 72,
+            "Promedio_Citas": 1.3055555555555556
+        }
+    ],
+    "keywords": [
+        {
+            "Keyword": "Large language models",
+            "Frecuencia": 79
+        },
+        {
+            "Keyword": "Quantization",
+            "Frecuencia": 43
+        },
+        {
+            "Keyword": "Computational modeling",
+            "Frecuencia": 40
+        },
+        {
+            "Keyword": "Knowledge distillation",
+            "Frecuencia": 27
+        },
+        {
+            "Keyword": "Model compression",
+            "Frecuencia": 24
+        },
+        {
+            "Keyword": "Edge computing",
+            "Frecuencia": 19
+        },
+        {
+            "Keyword": "Training",
+            "Frecuencia": 19
+        },
+        {
+            "Keyword": "Adaptation models",
+            "Frecuencia": 17
+        },
+        {
+            "Keyword": "Deep learning",
+            "Frecuencia": 14
+        },
+        {
+            "Keyword": "Optimization",
+            "Frecuencia": 14
+        },
+        {
+            "Keyword": "Transformers",
+            "Frecuencia": 13
+        },
+        {
+            "Keyword": "Accuracy",
+            "Frecuencia": 12
+        }
+    ],
+    "countries": [
+        {
+            "Country": "CHINA",
+            "SCP": 52,
+            "MCP": 35,
+            "Total": 87
+        },
+        {
+            "Country": "USA",
+            "SCP": 7,
+            "MCP": 19,
+            "Total": 26
+        },
+        {
+            "Country": "UNITED KINGDOM",
+            "SCP": 4,
+            "MCP": 10,
+            "Total": 14
+        },
+        {
+            "Country": "SINGAPORE",
+            "SCP": 0,
+            "MCP": 13,
+            "Total": 13
+        },
+        {
+            "Country": "SOUTH KOREA",
+            "SCP": 7,
+            "MCP": 3,
+            "Total": 10
+        },
+        {
+            "Country": "CANADA",
+            "SCP": 0,
+            "MCP": 9,
+            "Total": 9
+        },
+        {
+            "Country": "INDIA",
+            "SCP": 7,
+            "MCP": 2,
+            "Total": 9
+        },
+        {
+            "Country": "HONG KONG",
+            "SCP": 0,
+            "MCP": 4,
+            "Total": 4
+        },
+        {
+            "Country": "JAPAN",
+            "SCP": 1,
+            "MCP": 3,
+            "Total": 4
+        },
+        {
+            "Country": "SWITZERLAND",
+            "SCP": 1,
+            "MCP": 3,
+            "Total": 4
+        },
+        {
+            "Country": "TAIWAN",
+            "SCP": 1,
+            "MCP": 2,
+            "Total": 3
+        },
+        {
+            "Country": "SAUDI ARABIA",
+            "SCP": 1,
+            "MCP": 2,
+            "Total": 3
+        },
+        {
+            "Country": "GERMANY",
+            "SCP": 1,
+            "MCP": 1,
+            "Total": 2
+        },
+        {
+            "Country": "SPAIN",
+            "SCP": 2,
+            "MCP": 0,
+            "Total": 2
+        },
+        {
+            "Country": "NORWAY",
+            "SCP": 0,
+            "MCP": 2,
+            "Total": 2
+        }
+    ],
+    "bradford": [
+        {
+            "Journal": "IEEE ACCESS",
+            "Rank": 1,
+            "Cum_Count": 14,
+            "Zone": 1
+        },
+        {
+            "Journal": "IEEE TRANSACTIONS ON MOBILE COMPUTING",
+            "Rank": 2,
+            "Cum_Count": 21,
+            "Zone": 1
+        },
+        {
+            "Journal": "IEEE INTERNET OF THINGS JOURNAL",
+            "Rank": 3,
+            "Cum_Count": 27,
+            "Zone": 1
+        },
+        {
+            "Journal": "Neurocomputing",
+            "Rank": 4,
+            "Cum_Count": 30,
+            "Zone": 1
+        },
+        {
+            "Journal": "IEEE TRANSACTIONS ON NETWORK SCIENCE AND ENGINEERING",
+            "Rank": 5,
+            "Cum_Count": 33,
+            "Zone": 1
+        },
+        {
+            "Journal": "Applied Sciences-Basel",
+            "Rank": 6,
+            "Cum_Count": 36,
+            "Zone": 1
+        },
+        {
+            "Journal": "Visual Intelligence",
+            "Rank": 7,
+            "Cum_Count": 39,
+            "Zone": 1
+        },
+        {
+            "Journal": "Acm Computing Surveys",
+            "Rank": 8,
+            "Cum_Count": 42,
+            "Zone": 1
+        },
+        {
+            "Journal": "Ieee Trans Comput Aided Des Integr Circuits Syst",
+            "Rank": 9,
+            "Cum_Count": 44,
+            "Zone": 1
+        },
+        {
+            "Journal": "Ieee Wireless Communications Letters",
+            "Rank": 10,
+            "Cum_Count": 46,
+            "Zone": 1
+        },
+        {
+            "Journal": "Ieee Transactions On Geoscience And Remote Sensing",
+            "Rank": 11,
+            "Cum_Count": 48,
+            "Zone": 1
+        },
+        {
+            "Journal": "Ieee Communications Surveys And Tutorials",
+            "Rank": 12,
+            "Cum_Count": 50,
+            "Zone": 1
+        },
+        {
+            "Journal": "Pattern Recognition",
+            "Rank": 13,
+            "Cum_Count": 52,
+            "Zone": 2
+        },
+        {
+            "Journal": "Applied Soft Computing",
+            "Rank": 14,
+            "Cum_Count": 54,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Computer Architecture Letters",
+            "Rank": 15,
+            "Cum_Count": 56,
+            "Zone": 2
+        },
+        {
+            "Journal": "Entropy",
+            "Rank": 16,
+            "Cum_Count": 58,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Journal Of Selected Topics In Signal Processing",
+            "Rank": 17,
+            "Cum_Count": 60,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Transactions On Computer-Aided Design Of Integrated Circuits And Systems",
+            "Rank": 18,
+            "Cum_Count": 62,
+            "Zone": 2
+        },
+        {
+            "Journal": "Cmc-Computers Materials & Continua",
+            "Rank": 19,
+            "Cum_Count": 64,
+            "Zone": 2
+        },
+        {
+            "Journal": "Acm Transactions On Embedded Computing Systems",
+            "Rank": 20,
+            "Cum_Count": 66,
+            "Zone": 2
+        },
+        {
+            "Journal": "Electronics",
+            "Rank": 21,
+            "Cum_Count": 68,
+            "Zone": 2
+        },
+        {
+            "Journal": "Acm Transactions On Reconfigurable Technology And Systems",
+            "Rank": 22,
+            "Cum_Count": 70,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Trans Circuits Syst Video Technol",
+            "Rank": 23,
+            "Cum_Count": 71,
+            "Zone": 2
+        },
+        {
+            "Journal": "Auton. Intell. Syst.",
+            "Rank": 24,
+            "Cum_Count": 72,
+            "Zone": 2
+        },
+        {
+            "Journal": "Cluster Comput.",
+            "Rank": 25,
+            "Cum_Count": 73,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Trans Consum Electron",
+            "Rank": 26,
+            "Cum_Count": 74,
+            "Zone": 2
+        },
+        {
+            "Journal": "J. Donghua Univ.",
+            "Rank": 27,
+            "Cum_Count": 75,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee J. Biomedical Health Informat.",
+            "Rank": 28,
+            "Cum_Count": 76,
+            "Zone": 2
+        },
+        {
+            "Journal": "Nat. Commun.",
+            "Rank": 29,
+            "Cum_Count": 77,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Trans. Circuits Syst. Artif. Intell.",
+            "Rank": 30,
+            "Cum_Count": 78,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Trans. Serv. Comput.",
+            "Rank": 31,
+            "Cum_Count": 79,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Robot. Autom.",
+            "Rank": 32,
+            "Cum_Count": 80,
+            "Zone": 2
+        },
+        {
+            "Journal": "Road Mater. Pavement Des.",
+            "Rank": 33,
+            "Cum_Count": 81,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Trans Evol Comput",
+            "Rank": 34,
+            "Cum_Count": 82,
+            "Zone": 2
+        },
+        {
+            "Journal": "J. Edge Comput.",
+            "Rank": 35,
+            "Cum_Count": 83,
+            "Zone": 2
+        },
+        {
+            "Journal": "Comput. Eng. Appl.",
+            "Rank": 36,
+            "Cum_Count": 84,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Trans. Veh. Technol.",
+            "Rank": 37,
+            "Cum_Count": 85,
+            "Zone": 2
+        },
+        {
+            "Journal": "Neural Netw.",
+            "Rank": 38,
+            "Cum_Count": 86,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Trans Multimedia",
+            "Rank": 39,
+            "Cum_Count": 87,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Commun Mag",
+            "Rank": 40,
+            "Cum_Count": 88,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee. Trans. Artif. Intell.",
+            "Rank": 41,
+            "Cum_Count": 89,
+            "Zone": 2
+        },
+        {
+            "Journal": "Icic Express Lett.",
+            "Rank": 42,
+            "Cum_Count": 90,
+            "Zone": 2
+        },
+        {
+            "Journal": "Int. J. Inform. Vis.",
+            "Rank": 43,
+            "Cum_Count": 91,
+            "Zone": 2
+        },
+        {
+            "Journal": "Eai Endorsed Trans. Ai Robot.",
+            "Rank": 44,
+            "Cum_Count": 92,
+            "Zone": 2
+        },
+        {
+            "Journal": "Adv. Transdiscipl. Eng.",
+            "Rank": 45,
+            "Cum_Count": 93,
+            "Zone": 2
+        },
+        {
+            "Journal": "Frontiers In Robotics And Ai",
+            "Rank": 46,
+            "Cum_Count": 94,
+            "Zone": 2
+        },
+        {
+            "Journal": "Ieee Robotics And Automation Letters",
+            "Rank": 47,
+            "Cum_Count": 95,
+            "Zone": 2
+        },
+        {
+            "Journal": "Information Fusion",
+            "Rank": 48,
+            "Cum_Count": 96,
+            "Zone": 2
+        },
+        {
+            "Journal": "Computerized Medical Imaging And Graphics",
+            "Rank": 49,
+            "Cum_Count": 97,
+            "Zone": 2
+        },
+        {
+            "Journal": "Neural Networks",
+            "Rank": 50,
+            "Cum_Count": 98,
+            "Zone": 2
+        },
+        {
+            "Journal": "Journal Of Language And Education",
+            "Rank": 51,
+            "Cum_Count": 99,
+            "Zone": 2
+        },
+        {
+            "Journal": "Intelligent Data Analysis",
+            "Rank": 52,
+            "Cum_Count": 100,
+            "Zone": 2
+        },
+        {
+            "Journal": "Journal Of Computer Science And Technology",
+            "Rank": 53,
+            "Cum_Count": 101,
+            "Zone": 3
+        },
+        {
+            "Journal": "Data Mining And Knowledge Discovery",
+            "Rank": 54,
+            "Cum_Count": 102,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Communications Letters",
+            "Rank": 55,
+            "Cum_Count": 103,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ai",
+            "Rank": 56,
+            "Cum_Count": 104,
+            "Zone": 3
+        },
+        {
+            "Journal": "Journal Of Electronics & Information Technology",
+            "Rank": 57,
+            "Cum_Count": 105,
+            "Zone": 3
+        },
+        {
+            "Journal": "Complex & Intelligent Systems",
+            "Rank": 58,
+            "Cum_Count": 106,
+            "Zone": 3
+        },
+        {
+            "Journal": "Future Generation Computer Systems-The International Journal Of Escience",
+            "Rank": 59,
+            "Cum_Count": 107,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Transactions On Electron Devices",
+            "Rank": 60,
+            "Cum_Count": 108,
+            "Zone": 3
+        },
+        {
+            "Journal": "Computer Networks",
+            "Rank": 61,
+            "Cum_Count": 109,
+            "Zone": 3
+        },
+        {
+            "Journal": "Archives For Technical Sciences",
+            "Rank": 62,
+            "Cum_Count": 110,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Transactions On Pattern Analysis And Machine Intelligence",
+            "Rank": 63,
+            "Cum_Count": 111,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Transactions On Wireless Communications",
+            "Rank": 64,
+            "Cum_Count": 112,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Transactions On Multimedia",
+            "Rank": 65,
+            "Cum_Count": 113,
+            "Zone": 3
+        },
+        {
+            "Journal": "Reliability Engineering & System Safety",
+            "Rank": 66,
+            "Cum_Count": 114,
+            "Zone": 3
+        },
+        {
+            "Journal": "Sensors",
+            "Rank": 67,
+            "Cum_Count": 115,
+            "Zone": 3
+        },
+        {
+            "Journal": "Knowledge And Information Systems",
+            "Rank": 68,
+            "Cum_Count": 116,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Transactions On Consumer Electronics",
+            "Rank": 69,
+            "Cum_Count": 117,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Communications Magazine",
+            "Rank": 70,
+            "Cum_Count": 118,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Internet Of Things Magazine",
+            "Rank": 71,
+            "Cum_Count": 119,
+            "Zone": 3
+        },
+        {
+            "Journal": "International Journal Of High Performance Computing Applications",
+            "Rank": 72,
+            "Cum_Count": 120,
+            "Zone": 3
+        },
+        {
+            "Journal": "Array",
+            "Rank": 73,
+            "Cum_Count": 121,
+            "Zone": 3
+        },
+        {
+            "Journal": "Cluster Computing-The Journal Of Networks Software Tools And Applications",
+            "Rank": 74,
+            "Cum_Count": 122,
+            "Zone": 3
+        },
+        {
+            "Journal": "Discover Computing",
+            "Rank": 75,
+            "Cum_Count": 123,
+            "Zone": 3
+        },
+        {
+            "Journal": "Expert Systems",
+            "Rank": 76,
+            "Cum_Count": 124,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Network",
+            "Rank": 77,
+            "Cum_Count": 125,
+            "Zone": 3
+        },
+        {
+            "Journal": "Journal Of Biomedical Informatics",
+            "Rank": 78,
+            "Cum_Count": 126,
+            "Zone": 3
+        },
+        {
+            "Journal": "Acm Transactions On Internet Of Things",
+            "Rank": 79,
+            "Cum_Count": 127,
+            "Zone": 3
+        },
+        {
+            "Journal": "Acm Transactions On Design Automation Of Electronic Systems",
+            "Rank": 80,
+            "Cum_Count": 128,
+            "Zone": 3
+        },
+        {
+            "Journal": "International Journal Of Electronics And Telecommunications",
+            "Rank": 81,
+            "Cum_Count": 129,
+            "Zone": 3
+        },
+        {
+            "Journal": "Transactions Of The Association For Computational Linguistics",
+            "Rank": 82,
+            "Cum_Count": 130,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Transactions On Automation Science And Engineering",
+            "Rank": 83,
+            "Cum_Count": 131,
+            "Zone": 3
+        },
+        {
+            "Journal": "Pattern Recognition Letters",
+            "Rank": 84,
+            "Cum_Count": 132,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Transactions On Green Communications And Networking",
+            "Rank": 85,
+            "Cum_Count": 133,
+            "Zone": 3
+        },
+        {
+            "Journal": "Future Internet",
+            "Rank": 86,
+            "Cum_Count": 134,
+            "Zone": 3
+        },
+        {
+            "Journal": "Acm Transactions On Privacy And Security",
+            "Rank": 87,
+            "Cum_Count": 135,
+            "Zone": 3
+        },
+        {
+            "Journal": "Information Processing & Management",
+            "Rank": 88,
+            "Cum_Count": 136,
+            "Zone": 3
+        },
+        {
+            "Journal": "Engineering Applications Of Artificial Intelligence",
+            "Rank": 89,
+            "Cum_Count": 137,
+            "Zone": 3
+        },
+        {
+            "Journal": "Advanced Science",
+            "Rank": 90,
+            "Cum_Count": 138,
+            "Zone": 3
+        },
+        {
+            "Journal": "Machine Learning And Knowledge Extraction",
+            "Rank": 91,
+            "Cum_Count": 139,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Transactions On Knowledge And Data Engineering",
+            "Rank": 92,
+            "Cum_Count": 140,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Transactions On Circuits And Systems I-Regular Papers",
+            "Rank": 93,
+            "Cum_Count": 141,
+            "Zone": 3
+        },
+        {
+            "Journal": "Computer Standards & Interfaces",
+            "Rank": 94,
+            "Cum_Count": 142,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Transactions On Very Large Scale Integration (Vlsi) Systems",
+            "Rank": 95,
+            "Cum_Count": 143,
+            "Zone": 3
+        },
+        {
+            "Journal": "Ieee Journal On Selected Areas In Communications",
+            "Rank": 96,
+            "Cum_Count": 144,
+            "Zone": 3
+        },
+        {
+            "Journal": "Journal Of Medical Systems",
+            "Rank": 97,
+            "Cum_Count": 145,
+            "Zone": 3
+        },
+        {
+            "Journal": "Frontiers In Artificial Intelligence",
+            "Rank": 98,
+            "Cum_Count": 146,
+            "Zone": 3
+        },
+        {
+            "Journal": "Scientific Reports",
+            "Rank": 99,
+            "Cum_Count": 147,
+            "Zone": 3
+        },
+        {
+            "Journal": "Software-Practice & Experience",
+            "Rank": 100,
+            "Cum_Count": 148,
+            "Zone": 3
+        },
+        {
+            "Journal": "Knowledge-Based Systems",
+            "Rank": 101,
+            "Cum_Count": 149,
+            "Zone": 3
+        }
+    ],
+    "bradford_zone1_end": 12,
+    "bradford_zone2_end": 52,
+    "thematic": [
+        {
+            "Keyword": "Large language models",
+            "Centrality": 175.0,
+            "Density": 2.9211822660098523,
+            "Frequency": 79
+        },
+        {
+            "Keyword": "Quantization",
+            "Centrality": 128.0,
+            "Density": 3.2153846153846155,
+            "Frequency": 43
+        },
+        {
+            "Keyword": "Computational modeling",
+            "Centrality": 194.0,
+            "Density": 2.8275862068965516,
+            "Frequency": 40
+        },
+        {
+            "Keyword": "Knowledge distillation",
+            "Centrality": 45.0,
+            "Density": 4.08130081300813,
+            "Frequency": 27
+        },
+        {
+            "Keyword": "Model compression",
+            "Centrality": 70.0,
+            "Density": 3.6298342541436464,
+            "Frequency": 24
+        },
+        {
+            "Keyword": "Edge computing",
+            "Centrality": 44.0,
+            "Density": 4.208,
+            "Frequency": 19
+        },
+        {
+            "Keyword": "Training",
+            "Centrality": 97.0,
+            "Density": 3.478494623655914,
+            "Frequency": 19
+        },
+        {
+            "Keyword": "Adaptation models",
+            "Centrality": 93.0,
+            "Density": 3.480874316939891,
+            "Frequency": 17
+        },
+        {
+            "Keyword": "Deep learning",
+            "Centrality": 33.0,
+            "Density": 4.362637362637362,
+            "Frequency": 14
+        },
+        {
+            "Keyword": "Optimization",
+            "Centrality": 61.0,
+            "Density": 3.8128654970760234,
+            "Frequency": 14
+        },
+        {
+            "Keyword": "Transformers",
+            "Centrality": 72.0,
+            "Density": 3.6277777777777778,
+            "Frequency": 13
+        },
+        {
+            "Keyword": "Accuracy",
+            "Centrality": 62.0,
+            "Density": 4.372727272727273,
+            "Frequency": 12
+        },
+        {
+            "Keyword": "Hardware",
+            "Centrality": 43.0,
+            "Density": 4.229629629629629,
+            "Frequency": 11
+        },
+        {
+            "Keyword": "Performance evaluation",
+            "Centrality": 65.0,
+            "Density": 3.738095238095238,
+            "Frequency": 10
+        },
+        {
+            "Keyword": "Memory management",
+            "Centrality": 51.0,
+            "Density": 4.669811320754717,
+            "Frequency": 9
+        },
+        {
+            "Keyword": "Artificial intelligence",
+            "Centrality": 34.0,
+            "Density": 4.330508474576271,
+            "Frequency": 9
+        },
+        {
+            "Keyword": "Servers",
+            "Centrality": 46.0,
+            "Density": 4.068181818181818,
+            "Frequency": 8
+        },
+        {
+            "Keyword": "Foundation models",
+            "Centrality": 31.0,
+            "Density": 4.239669421487603,
+            "Frequency": 8
+        },
+        {
+            "Keyword": "Neural networks",
+            "Centrality": 25.0,
+            "Density": 5.1571428571428575,
+            "Frequency": 8
+        },
+        {
+            "Keyword": "Edge ai",
+            "Centrality": 13.0,
+            "Density": 5.21875,
+            "Frequency": 7
+        },
+        {
+            "Keyword": "Computer architecture",
+            "Centrality": 33.0,
+            "Density": 4.226890756302521,
+            "Frequency": 7
+        },
+        {
+            "Keyword": "Costs",
+            "Centrality": 43.0,
+            "Density": 4.248,
+            "Frequency": 7
+        },
+        {
+            "Keyword": "Decoding",
+            "Centrality": 37.0,
+            "Density": 4.618181818181818,
+            "Frequency": 7
+        },
+        {
+            "Keyword": "Vectors",
+            "Centrality": 30.0,
+            "Density": 4.734177215189874,
+            "Frequency": 7
+        },
+        {
+            "Keyword": "Large language model (llm)",
+            "Centrality": 11.0,
+            "Density": 5.775,
+            "Frequency": 6
+        }
+    ],
+    "thematic_median_c": 45.0,
+    "thematic_median_d": 4.226890756302521,
+    "sankey": {
+        "nodes": [
+            {
+                "name": "CHINA"
+            },
+            {
+                "name": "USA"
+            },
+            {
+                "name": "UNITED KINGDOM"
+            },
+            {
+                "name": "SINGAPORE"
+            },
+            {
+                "name": "SOUTH KOREA"
+            },
+            {
+                "name": "CANADA"
+            },
+            {
+                "name": "INDIA"
+            },
+            {
+                "name": "HONG KONG"
+            },
+            {
+                "name": "Large language models"
+            },
+            {
+                "name": "Quantization"
+            },
+            {
+                "name": "Computational modeling"
+            },
+            {
+                "name": "Knowledge distillation"
+            },
+            {
+                "name": "Model compression"
+            },
+            {
+                "name": "Edge computing"
+            },
+            {
+                "name": "Training"
+            },
+            {
+                "name": "Adaptation models"
+            },
+            {
+                "name": "Deep learning"
+            },
+            {
+                "name": "Optimization"
+            },
+            {
+                "name": "IEEE ACCESS"
+            },
+            {
+                "name": "IEEE TRANSACTIONS ON MOBILE COMPUTING"
+            },
+            {
+                "name": "IEEE INTERNET OF THINGS JOURNAL"
+            },
+            {
+                "name": "Neurocomputing"
+            },
+            {
+                "name": "IEEE TRANSACTIONS ON NETWORK SCIENCE AND ENGINEERING"
+            },
+            {
+                "name": "Applied Sciences-Basel"
+            },
+            {
+                "name": "Visual Intelligence"
+            },
+            {
+                "name": "Acm Computing Surveys"
+            }
+        ],
+        "links": [
+            {
+                "source": 5,
+                "target": 8,
+                "value": 1
+            },
+            {
+                "source": 0,
+                "target": 8,
+                "value": 14
+            },
+            {
+                "source": 3,
+                "target": 8,
+                "value": 2
+            },
+            {
+                "source": 1,
+                "target": 8,
+                "value": 6
+            },
+            {
+                "source": 0,
+                "target": 11,
+                "value": 4
+            },
+            {
+                "source": 1,
+                "target": 11,
+                "value": 1
+            },
+            {
+                "source": 4,
+                "target": 10,
+                "value": 3
+            },
+            {
+                "source": 4,
+                "target": 15,
+                "value": 1
+            },
+            {
+                "source": 4,
+                "target": 8,
+                "value": 5
+            },
+            {
+                "source": 4,
+                "target": 9,
+                "value": 4
+            },
+            {
+                "source": 0,
+                "target": 15,
+                "value": 6
+            },
+            {
+                "source": 0,
+                "target": 13,
+                "value": 1
+            },
+            {
+                "source": 0,
+                "target": 10,
+                "value": 10
+            },
+            {
+                "source": 0,
+                "target": 14,
+                "value": 6
+            },
+            {
+                "source": 0,
+                "target": 16,
+                "value": 4
+            },
+            {
+                "source": 0,
+                "target": 9,
+                "value": 6
+            },
+            {
+                "source": 1,
+                "target": 9,
+                "value": 2
+            },
+            {
+                "source": 1,
+                "target": 10,
+                "value": 1
+            },
+            {
+                "source": 1,
+                "target": 14,
+                "value": 1
+            },
+            {
+                "source": 1,
+                "target": 12,
+                "value": 2
+            },
+            {
+                "source": 5,
+                "target": 14,
+                "value": 1
+            },
+            {
+                "source": 5,
+                "target": 10,
+                "value": 1
+            },
+            {
+                "source": 5,
+                "target": 12,
+                "value": 2
+            },
+            {
+                "source": 3,
+                "target": 10,
+                "value": 1
+            },
+            {
+                "source": 3,
+                "target": 15,
+                "value": 1
+            },
+            {
+                "source": 0,
+                "target": 12,
+                "value": 4
+            },
+            {
+                "source": 4,
+                "target": 11,
+                "value": 2
+            },
+            {
+                "source": 4,
+                "target": 16,
+                "value": 2
+            },
+            {
+                "source": 0,
+                "target": 17,
+                "value": 2
+            },
+            {
+                "source": 1,
+                "target": 16,
+                "value": 1
+            },
+            {
+                "source": 1,
+                "target": 13,
+                "value": 1
+            },
+            {
+                "source": 4,
+                "target": 17,
+                "value": 1
+            },
+            {
+                "source": 4,
+                "target": 12,
+                "value": 3
+            },
+            {
+                "source": 2,
+                "target": 11,
+                "value": 1
+            },
+            {
+                "source": 8,
+                "target": 19,
+                "value": 4
+            },
+            {
+                "source": 8,
+                "target": 21,
+                "value": 1
+            },
+            {
+                "source": 8,
+                "target": 18,
+                "value": 14
+            },
+            {
+                "source": 11,
+                "target": 19,
+                "value": 1
+            },
+            {
+                "source": 10,
+                "target": 18,
+                "value": 7
+            },
+            {
+                "source": 15,
+                "target": 18,
+                "value": 2
+            },
+            {
+                "source": 9,
+                "target": 18,
+                "value": 7
+            },
+            {
+                "source": 15,
+                "target": 22,
+                "value": 2
+            },
+            {
+                "source": 13,
+                "target": 22,
+                "value": 1
+            },
+            {
+                "source": 8,
+                "target": 22,
+                "value": 3
+            },
+            {
+                "source": 10,
+                "target": 22,
+                "value": 2
+            },
+            {
+                "source": 14,
+                "target": 22,
+                "value": 2
+            },
+            {
+                "source": 16,
+                "target": 22,
+                "value": 2
+            },
+            {
+                "source": 10,
+                "target": 19,
+                "value": 4
+            },
+            {
+                "source": 9,
+                "target": 19,
+                "value": 2
+            },
+            {
+                "source": 9,
+                "target": 20,
+                "value": 4
+            },
+            {
+                "source": 10,
+                "target": 20,
+                "value": 4
+            },
+            {
+                "source": 14,
+                "target": 20,
+                "value": 1
+            },
+            {
+                "source": 8,
+                "target": 20,
+                "value": 4
+            },
+            {
+                "source": 12,
+                "target": 20,
+                "value": 1
+            },
+            {
+                "source": 14,
+                "target": 18,
+                "value": 3
+            },
+            {
+                "source": 12,
+                "target": 18,
+                "value": 6
+            },
+            {
+                "source": 8,
+                "target": 23,
+                "value": 1
+            },
+            {
+                "source": 11,
+                "target": 24,
+                "value": 1
+            },
+            {
+                "source": 15,
+                "target": 20,
+                "value": 1
+            },
+            {
+                "source": 12,
+                "target": 25,
+                "value": 1
+            },
+            {
+                "source": 9,
+                "target": 25,
+                "value": 1
+            },
+            {
+                "source": 8,
+                "target": 25,
+                "value": 1
+            },
+            {
+                "source": 11,
+                "target": 20,
+                "value": 1
+            },
+            {
+                "source": 16,
+                "target": 20,
+                "value": 1
+            },
+            {
+                "source": 9,
+                "target": 23,
+                "value": 1
+            },
+            {
+                "source": 17,
+                "target": 23,
+                "value": 1
+            },
+            {
+                "source": 10,
+                "target": 23,
+                "value": 1
+            },
+            {
+                "source": 12,
+                "target": 23,
+                "value": 3
+            },
+            {
+                "source": 14,
+                "target": 23,
+                "value": 1
+            },
+            {
+                "source": 15,
+                "target": 23,
+                "value": 1
+            },
+            {
+                "source": 13,
+                "target": 20,
+                "value": 1
+            },
+            {
+                "source": 9,
+                "target": 24,
+                "value": 2
+            },
+            {
+                "source": 8,
+                "target": 24,
+                "value": 2
+            },
+            {
+                "source": 16,
+                "target": 24,
+                "value": 2
+            },
+            {
+                "source": 12,
+                "target": 24,
+                "value": 1
+            },
+            {
+                "source": 15,
+                "target": 19,
+                "value": 2
+            },
+            {
+                "source": 16,
+                "target": 18,
+                "value": 2
+            },
+            {
+                "source": 13,
+                "target": 18,
+                "value": 1
+            },
+            {
+                "source": 11,
+                "target": 18,
+                "value": 3
+            },
+            {
+                "source": 17,
+                "target": 20,
+                "value": 1
+            },
+            {
+                "source": 17,
+                "target": 18,
+                "value": 2
+            },
+            {
+                "source": 14,
+                "target": 19,
+                "value": 1
+            },
+            {
+                "source": 11,
+                "target": 21,
+                "value": 1
+            },
+            {
+                "source": 16,
+                "target": 19,
+                "value": 1
+            }
+        ],
+        "country_count": 8,
+        "keyword_count": 10,
+        "journal_count": 8
+    },
+    "articles": [
+        {
+            "title": "The Teacher-Student Interactive Cycle: Joint Optimization with Inner-Loop Self-Distillation in Prompted Foundation Models for Efficient Semantic Segmentation",
+            "authors": "Li M.; Zhao Q.; Lyu S.; Jiang J.; Zou L.; Yao D.; Cheng G.; Yang C.",
+            "journal": "Ieee Trans Circuits Syst Video Technol",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "Efficient semantic segmentation; Knowledge distillation; Mutual learning; Prompted foundation model"
+        },
+        {
+            "title": "Fisher-based Layer-wise Adaptive Sparsification for Efficient Pruning of Large Language Models",
+            "authors": "Sun C.; Yu H.; Li X.",
+            "journal": "IEEE TRANSACTIONS ON MOBILE COMPUTING",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "Fisher matrix; Large language models; Layer-wise sparsification; Pruning"
+        },
+        {
+            "title": "LORA: A Latency-Oriented Recurrent Architecture for Large Language Model on Multi-FPGA Platform with Communication Optimization",
+            "authors": "Zheng Z.; Cheng Q.; Wang T.; Lou W.; Gong L.; Chen X.; Wang C.; Zhou X.",
+            "journal": "Ieee Trans Comput Aided Des Integr Circuits Syst",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "automatic speech recognition (ASR); Habitat simulator; human-robot interaction (HRI); large language model (LLM); Llama2 model; robot operating system (ROS)"
+        },
+        {
+            "title": "Strategies for computational efficiency in small language models",
+            "authors": "Taylar J.",
+            "journal": "Auton. Intell. Syst.",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "Blood Glucose Prediction; Internet of Things (IoT); Large Language Models (LLMs); Smart and Connected Health (SCH); Type 1 Diabetes Mellitus (T1DM)"
+        },
+        {
+            "title": "Lightweight large language model based hierarchical federated learning for B5G enabled IoT intrusion detection networks",
+            "authors": "Mohawesh R.; Al-Obiedollah H.; Maqsood S.; Bany Salameh H.",
+            "journal": "Cluster Comput.",
+            "year": 2026,
+            "citations": 0,
+            "keywords": ""
+        },
+        {
+            "title": "SQLLM: A Secure and Quantized Framework for Large Language Models in 5G Private Network Operations",
+            "authors": "Ma J.; Liu T.; Shang Y.; Hu N.; Xia L.; Liao P.; Shang Y.",
+            "journal": "Ieee Trans Consum Electron",
+            "year": 2026,
+            "citations": 1,
+            "keywords": "Data Center; LLM; Multi-FPGA Acceleration"
+        },
+        {
+            "title": "ROSGPT: Natural Language Control of Mobile Robots Navigation via Large Language Model; [ROSGPT: \u57fa\u4e8e\u5927\u8bed\u8a00\u6a21\u578b\u7684\u673a\u5668\u4eba\u81ea\u7136\u8bed\u8a00\u5bfc\u822a\u7cfb\u7edf]",
+            "authors": "Huang J.; Zhao M.; Zhang H.",
+            "journal": "J. Donghua Univ.",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "Generative AI; Large Language Models (LLMs); Natural Language Processing (NLP); Small Language Models (SLMs)"
+        },
+        {
+            "title": "Diffusion-facilitated knowledge distillation in human activity recognition",
+            "authors": "Wang L.; Zhang L.; Cheng D.; Yao M.; Wu H.; Song A.",
+            "journal": "Neurocomputing",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "B5G; Federated Learning; Intrusion Detection; IoT; Large Language Models"
+        },
+        {
+            "title": "DiabLLM: An LLM-Based Framework for Blood Glucose Prediction in Type 1 Diabetes",
+            "authors": "Mahmoudi A.; Farahani G.; Domanski P.; Farahani B.; Firouzi F.; Chakrabarty K.",
+            "journal": "Ieee J. Biomedical Health Informat.",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "Large language model; LoRA fine-tuning; network attack identification; private network operation; static quantization"
+        },
+        {
+            "title": "Efficient GPT-4V level multimodal large language model for deployment on edge devices",
+            "authors": "Yao Y.; Yu T.; Zhang A.; Wang C.; Cui J.; Zhu H.; Cai T.; Chen C.; Li H.; Zhao W.; He Z.; Chen Q.; Zhou R.; Zou Z.; Zhang H.; Hu S.; Zheng Z.; Zhou J.; Cai J.; Han X.; Zeng G.; Li D.; Liu Z.; Sun M.",
+            "journal": "Nat. Commun.",
+            "year": 2025,
+            "citations": 1,
+            "keywords": "Deep learning; Diffusion model; Human activity recognition; Knowledge distillation; Model compression"
+        },
+        {
+            "title": "VitaLLM: A Versatile, Ultra-Compact Ternary LLM Accelerator with Dependency-Aware Scheduling",
+            "authors": "Lin Z.-W.; Chang T.-S.",
+            "journal": "Ieee Trans. Circuits Syst. Artif. Intell.",
+            "year": 2026,
+            "citations": 15,
+            "keywords": ""
+        },
+        {
+            "title": "Diffusion-Based Dynamic Contract for Federated AI Agent Construction in Mobile Metaverses",
+            "authors": "Wen J.; Kang J.; Zhang Y.; Zhong Y.; Niyato D.; Xu J.; Tang J.; Yuen C.",
+            "journal": "Ieee Trans. Serv. Comput.",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "AI agent construction; deep reinforcement learning; dynamic contract theory; enhanced diffusion models; mobile metaverses"
+        },
+        {
+            "title": "From Demand to Grounded Plan: Task Customization and Planning for Service Robots With Deep Learning and LLMs",
+            "authors": "Li Z.; Lu F.; Fu T.; Tian G.",
+            "journal": "Ieee Robot. Autom.",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "service robotics; Task planning"
+        },
+        {
+            "title": "Real-time edge AI algorithm for road defects detection",
+            "authors": "Li S.; Liu Y.; Zhou J.; Han R.; Kong X.; Xu R.",
+            "journal": "Road Mater. Pavement Des.",
+            "year": 2025,
+            "citations": 3,
+            "keywords": "distributed inference; edge computing; edge intelligence; knowledge distillation; large language models; model quantisation; real-time inference"
+        },
+        {
+            "title": "Spike-Driven Lightweight Large Language Model With Evolutionary Computation",
+            "authors": "Zhang M.; Wei W.; Zhou Z.; Liu W.; Zhang J.; Belatreche A.; Yang Y.",
+            "journal": "Ieee Trans Evol Comput",
+            "year": 2025,
+            "citations": 2,
+            "keywords": "edge devices; Lightweight Neural Network; NVIDIA Jetson Xavier NX Deployment Board Kit; quantisation and compression strategy; Road defects detection"
+        },
+        {
+            "title": "Edge intelligence unleashed: a survey on deploying large language models in resource-constrained environments",
+            "authors": "Semerikov S.O.; Vakaliuk T.A.; Kanevska O.B.; Ostroushko O.A.; Kolhatin A.O.",
+            "journal": "J. Edge Comput.",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "hardware acceleration; lightweight framework; model compression; on-device large language models; \u6a21\u578b\u538b\u7f29; \u786c\u4ef6\u52a0\u901f; \u8bbe\u5907\u7aef\u5927\u8bed\u8a00\u6a21\u578b; \u8f7b\u91cf\u5316\u6846\u67b6"
+        },
+        {
+            "title": "Survey of Research On-Device Large Language Models; [\u8bbe\u5907\u7aef\u5927\u8bed\u8a00\u6a21\u578b\u7814\u7a76\u7efc\u8ff0]",
+            "authors": "Zhao J.; Liu L.; Wang H.; Niu T.; Liu J.",
+            "journal": "Comput. Eng. Appl.",
+            "year": 2026,
+            "citations": 7,
+            "keywords": "Evolutionary computation; Large language model; Model compression; Spiking neural networks"
+        },
+        {
+            "title": "SAGEComm: Semantic-Aware Generation and Encoding for Next-Gen Communication",
+            "authors": "Chang S.-Y.; Kao Y.-C.; Han Z.",
+            "journal": "Ieee Trans. Veh. Technol.",
+            "year": 2026,
+            "citations": 1,
+            "keywords": ""
+        },
+        {
+            "title": "LaTP: LiDAR-aided multimodal token pruning for efficient trajectory prediction of autonomous driving",
+            "authors": "Lu Y.; Sun S.; Liu N.; Jiang B.; Li Y.; Chen J.; Zhang Y.; Zhu Y.; Velipasalar S.",
+            "journal": "Neural Netw.",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "Large Language Models (LLMs); Retrieval-Augmented Generation (RAG); Semantic communication; Semantic compression; Semantic Transmission Cost (STC)"
+        },
+        {
+            "title": "UniUltra: Interactive Parameter-Efficient SAM2 for Universal Ultrasound Segmentation",
+            "authors": "Li Y.; Xu Q.; Zhang Y.; He X.; Zhang Q.; Yao Y.; Tesem F.B.; Chen X.; Wang R.; Chen Z.; Chen C.W.",
+            "journal": "Ieee Trans Multimedia",
+            "year": 2026,
+            "citations": 4,
+            "keywords": "Autonomous driving; Large vision\u2013language model; Multimodal fusion; Transformer token pruning"
+        },
+        {
+            "title": "The MoE-Empowered Edge LLMS Deployment: Architecture, Challenges, and Opportunities",
+            "authors": "Li N.; Guo S.; Zhang T.; Li M.; Hong Z.; Zhou Q.; Yuan X.; Zhang H.",
+            "journal": "Ieee Commun Mag",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "lightweight foundation model; Parameter-efficient fine-tuning; ultrasound image segmentation"
+        },
+        {
+            "title": "CoT-Drive: Efficient Motion Forecasting for Autonomous Driving With LLMs and Chain-of-Thought Prompting",
+            "authors": "Liao H.; Kong H.; Wang B.; Wang C.; Wang K.Y.; He Z.; Xu C.; Li Z.",
+            "journal": "Ieee. Trans. Artif. Intell.",
+            "year": 2026,
+            "citations": 8,
+            "keywords": "Autonomous driving (AD); chain-of-thought (CoT) prompting; large language models (LLMs); motion forecasting"
+        },
+        {
+            "title": "EdgeSD: Efficient Speculative Decoding with Vision-Decoding Disaggregation for MLLM Inference in Edge-Cloud Networks",
+            "authors": "Huang H.; Zhan W.; Duan H.; Peng K.; Min G.; Zhao Z.; Zhao Z.; Ye Y.",
+            "journal": "IEEE TRANSACTIONS ON MOBILE COMPUTING",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "edge-cloud collaborative inference; mobile edge computing; Multimodal large language model inference; task scheduling"
+        },
+        {
+            "title": "Lightweight Edge Intelligence: Adapting 1.5B LLM via LoRA for Log Analysis in Campus Networks",
+            "authors": "Li Z.",
+            "journal": "IEEE ACCESS",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "Campus Network Security; Edge AI; Large Language Models; LoRA; Network Security; Privacy-Preserving Computing"
+        },
+        {
+            "title": "COMPARING THE PERFORMANCE OF QUESTION ANSWERING BY LLMS USING QUANTIZATION AND RETRIEVAL AUGMENTED GENERATION TECHNIQUES",
+            "authors": "Netisopakul P.; Haruethaipree S.",
+            "journal": "Icic Express Lett.",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "Document Question Answering (DQA); Large language models; Quantization; Resource-constrained machine; Retrieval Augmented Generation (RAG)"
+        },
+        {
+            "title": "Parameter-Efficient Fine-Tuning of LLMs for Low-Power Sentiment Analysis Applications",
+            "authors": "Shreshthi A.J.; Span\u00f2 S.; Di Nunzio L.; la Cesa R.; Re C.V.M.; Cardarilli G.C.",
+            "journal": "Int. J. Inform. Vis.",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "deep learning; Edge AI; large language models; low-power computing; Natural language processing; transfer learning"
+        },
+        {
+            "title": "P2PLLMEdge: Peer-to-Peer Framework for Localized Large Language Models using CPU only Resource-Constrained Edge",
+            "authors": "Ray P.P.; Pradhan M.P.",
+            "journal": "Eai Endorsed Trans. Ai Robot.",
+            "year": 2025,
+            "citations": 2,
+            "keywords": "Decentralized generative AI; Edge computing; Peer-to-peer; Quantized LLMs; Resource-constrained edge; Web frameworks"
+        },
+        {
+            "title": "Research on Lightweight LLM Optimization Methods Based on Knowledge Distillation",
+            "authors": "Liu Z.; Zeng H.; Yang G.",
+            "journal": "Adv. Transdiscipl. Eng.",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "feature alignment; Knowledge distillation; large language models; model compression; model lightweight"
+        },
+        {
+            "title": "Toward 6G Edge Intelligence: Lightweight LLMs for Intent-Driven Network Automation",
+            "authors": "Wu B.; Zou S.; Liwang M.; Ni W.; Wang X.; Tian Y.",
+            "journal": "IEEE TRANSACTIONS ON MOBILE COMPUTING",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "6\u00a0G edge intelligence; application intent; knowledge distillation; knowledge graph; large language model; network service request"
+        },
+        {
+            "title": "HotaQ: Hardware Oriented Token Adaptive Quantization for Large Language Models",
+            "authors": "Shen X.; Han Z.; Lu L.; Kong Z.; Dong P.; Li Z.; Xie Y.; Wu C.; Leeser M.; Zhao P.; Lin X.; Wang Y.",
+            "journal": "Ieee Trans Comput Aided Des Integr Circuits Syst",
+            "year": 2024,
+            "citations": 12,
+            "keywords": "FPGAs; Hardware and Software Co-design; Large Language Models (LLMs); Mobile; Quantization"
+        },
+        {
+            "title": "MaaI: ML-as-an-Infrastructure for Diverse Personalized Inference With Edge Offloading",
+            "authors": "Lee, J; Cho, J; Kim, S",
+            "journal": "IEEE ACCESS",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "COMPUTATIONAL MODELING; SERVERS; ADAPTATION MODELS; LOAD MODELING; TRANSFORMERS; FOUNDATION MODELS; HARDWARE; COMPUTER ARCHITECTURE; LARGE LANGUAGE MODELS; QUANTIZATION (SIGNAL); ARTIFICIAL INTELLIGENT INFRASTRUCTURE; COLLABORATED INFERENCE; EDGE SYSTEM ARCHITECTURE; LARGE LANGUAGE MODEL"
+        },
+        {
+            "title": "EdgeNetLLM: CloudEdge Collaborative Adaptation of Large Language Models for Mobile Networking",
+            "authors": "Zheng, XX; Li, Y; Zheng, BK; Zhang, C; Zhu, LH",
+            "journal": "IEEE TRANSACTIONS ON NETWORK SCIENCE AND ENGINEERING",
+            "year": 2026,
+            "citations": 1,
+            "keywords": "COSTS; ADAPTATION MODELS; EDGE COMPUTING; COLLABORATION; CLOUD COMPUTING; LEARNING SYSTEMS; LARGE LANGUAGE MODELS; COMPUTATIONAL MODELING; TRAINING; PROTEINS; DEEP LEARNING; CLOUD-EDGE COLLABORATION; MODEL ADAPTATION; MOBILE NETWORKING"
+        },
+        {
+            "title": "Tiny-WiFo: A Lightweight Wireless Foundation Model for Channel Prediction via Multi-Component Adaptive Knowledge Distillation",
+            "authors": "Zhang, HT; Gao, SJ; Cheng, X",
+            "journal": "Ieee Wireless Communications Letters",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "DECODING; COMPUTATIONAL MODELING; FREQUENCY MODULATION; PREDICTIVE MODELS; FOUNDATION MODELS; TRANSFORMERS; TIME-DOMAIN ANALYSIS; THREE-DIMENSIONAL DISPLAYS; TIME-FREQUENCY ANALYSIS; REAL-TIME SYSTEMS; KNOWLEDGE DISTILLATION; CHANNEL PREDICTION; FOUNDATION MODEL"
+        },
+        {
+            "title": "MAPEX: Modality-Aware Pruning of Experts for Remote Sensing Foundation Models",
+            "authors": "Hanna, J; Scheibenreif, L; Borth, D",
+            "journal": "Ieee Transactions On Geoscience And Remote Sensing",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "FOUNDATION MODELS; COMPUTATIONAL MODELING; REMOTE SENSING; ROUTING; DATA MODELS; TRAINING; ADAPTATION MODELS; DECODING; COSTS; COMPUTER VISION; FOUNDATION MODEL; MIXTURE-OF-EXPERT; MULTIMODALITY"
+        },
+        {
+            "title": "QSLR: Post-Training Compression via Quantized Sparse and Low-Rank Factorization",
+            "authors": "Kwon, E",
+            "journal": "IEEE ACCESS",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "LARGE LANGUAGE MODELS; VISION TRANSFORMER; POST-TRAINING PRUNING; POST-TRAINING PRUNING; POST-TRAINING QUANTIZATION; POST-TRAINING QUANTIZATION; LOW-RANK FACTORIZATION; LOW-RANK FACTORIZATION; LOW-RANK FACTORIZATION"
+        },
+        {
+            "title": "Integrating large language models for intuitive robot navigation",
+            "authors": "Xue, ZH; Elksnis, A; Wang, N",
+            "journal": "Frontiers In Robotics And Ai",
+            "year": 2025,
+            "citations": 1,
+            "keywords": "HOME ASSISTANCE ROBOTS; LARGE LANGUAGE MODELS; AI AGENT; LORA FINE-TUNING; QUANTIZATION"
+        },
+        {
+            "title": "FASTNav: Fine-Tuned Adaptive Small-Language- Models Trained for Multi-Point Robot Navigation",
+            "authors": "Chen, YX; Han, YX; Li, X",
+            "journal": "Ieee Robotics And Automation Letters",
+            "year": 2025,
+            "citations": 5,
+            "keywords": "NAVIGATION; ROBOTS; COMPUTATIONAL MODELING; ADAPTATION MODELS; SERVICE ROBOTS; ROBOT KINEMATICS; BOOSTING; PREDICTIVE MODELS; PLANNING; LOAD MODELING; INDOOR NAVIGATION; LARGE LANGUAGE MODELS; PATH PLANNING"
+        },
+        {
+            "title": "EdgeMoE: Empowering Sparse Large Language Models on Mobile Devices",
+            "authors": "Yi, RJ; Guo, LW; Wei, SY; Zhou, A; Wang, SG; Xu, MW",
+            "journal": "IEEE TRANSACTIONS ON MOBILE COMPUTING",
+            "year": 2025,
+            "citations": 15,
+            "keywords": "COMPUTATIONAL MODELING; TRANSFORMERS; ACCURACY; RANDOM ACCESS MEMORY; QUANTIZATION (SIGNAL); COSTS; PERFORMANCE EVALUATION; DECODING; RUNTIME; PIPELINES; LARGE LANGUAGE MODEL; MIXTURE OF EXPERTS; MOBILE DEVICES"
+        },
+        {
+            "title": "Tiny Federated Wireless Foundation Models for Resource-Constrained Devices",
+            "authors": "Hallaq, M; Khan, FMA; Aboulfotouh, A; Hassan, SA; Dev, K; Quasim, MT; Abou-Zeid, H",
+            "journal": "IEEE INTERNET OF THINGS JOURNAL",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "QUANTIZATION (SIGNAL); COMPUTATIONAL MODELING; SENSITIVITY; TRAINING; COMPUTATIONAL EFFICIENCY; ACCURACY; PERFORMANCE EVALUATION; MEMORY MANAGEMENT; LARGE LANGUAGE MODELS; HARDWARE ACCELERATION; ACCELERATOR; HARDWARE ACCELERATION; LARGE LANGUAGE MODEL; MIXED-PRECISION; MODEL COMPRESSION; POST-TRAINING QUANTIZATION; QUANTIZATION"
+        },
+        {
+            "title": "Sub 4-bit Power-of-Two-Based Mixed-Precision Quantization for Efficient LLM Compression and Acceleration",
+            "authors": "Cho, H; Padhy, AP; Camacho, F; Mukhopadhyay, S",
+            "journal": "IEEE ACCESS",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "INDUSTRIAL INTERNET OF THINGS; WIRELESS COMMUNICATION; WIRELESS SENSOR NETWORKS; FOUNDATION MODELS; TRAINING; COMPUTATIONAL MODELING; SENSORS; FREQUENCY MODULATION; MODEL COMPRESSION; ARTIFICIAL INTELLIGENCE; EDGE ARTIFICIAL INTELLIGENCE (AI); FEDERATED FOUNDATION MODELS (FMS); FEDERATED LEARNING (FL); INDUSTRIAL INTERNET OF THINGS (IIOT); MODEL COMPRESSION; STRUCTURED PRUNING; VISION TRANSFORMERS (VITS); WIRELESS FOUNDATION MODELS (WFMS)"
+        },
+        {
+            "title": "Federated and edge learning for large language models",
+            "authors": "Piccialli, F; Chiaro, D; Qi, P; Bellandi, V; Damiani, E",
+            "journal": "Information Fusion",
+            "year": 2025,
+            "citations": 14,
+            "keywords": "EDGE LEARNING; EDGE COMPUTING; FEDERATED LEARNING; LARGE LANGUAGE MODELS; NATURAL LANGUAGE PROCESSING"
+        },
+        {
+            "title": "Addressing Activation Outliers in LLMs: A Systematic Review of Post-Training Quantization Techniques",
+            "authors": "Czak\u00f3, P; Kert\u00e9sz, G; Sz\u00e9n\u00e1si, S",
+            "journal": "IEEE ACCESS",
+            "year": 2025,
+            "citations": 1,
+            "keywords": "QUANTIZATION (SIGNAL); COMPUTATIONAL MODELING; THROUGHPUT; ARITHMETIC; DECODING; ADAPTATION MODELS; TRANSFORMERS; SYSTEMATICS; SYSTEMATIC LITERATURE REVIEW; LARGE LANGUAGE MODELS; ACTIVATION OUTLIERS; EFFICIENT INFERENCE; LARGE LANGUAGE MODELS (LLMS); MODEL COMPRESSION; QUANTIZATION"
+        },
+        {
+            "title": "Fine-Tuning a Large Language Model for the Classification of Diseases Caused by Environmental Pollution",
+            "authors": "Hernandez-Angeles, JF; Rosales-Silva, AJ; Vianney-Kinani, JM; Posadas-Dur\u00e1n, JPF; Gallegos-Funes, FJ; Vel\u00e1zquez-Lozada, E; Miranda-Gonz\u00e1lez, AA; Uriostegui-Hernandez, D; Estrada-Soubran, JM",
+            "journal": "Applied Sciences-Basel",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "FINE-TUNING; QLORA; TRANSFORMERS; LARGE LANGUAGE MODEL; ENVIRONMENTAL POLLUTION"
+        },
+        {
+            "title": "Deploying Foundation Model Powered Agent Services: A Survey",
+            "authors": "Xu, WC; Chen, JY; Zheng, PR; Yi, XQ; Tian, TY; Zhu, WH; Wan, Q; Wang, HZ; Fan, YF; Su, QL; Shen, XM",
+            "journal": "Ieee Communications Surveys And Tutorials",
+            "year": 2026,
+            "citations": 2,
+            "keywords": "FREQUENCY MODULATION; OPTIMIZATION; ARTIFICIAL INTELLIGENCE; SURVEYS; COMPUTATIONAL MODELING; RESOURCE MANAGEMENT; TUTORIALS; PARALLEL PROCESSING; REAL-TIME SYSTEMS; LOAD MODELING; FOUNDATION MODEL; AI AGENT; CLOUD/EDGE COMPUTING; SERVING SYSTEM; DISTRIBUTED SYSTEM; AGI"
+        },
+        {
+            "title": "Learn from foundation model: Fruit detection model without manual annotation",
+            "authors": "Wang, YN; Fei, ZH; Li, RC; Ying, YB",
+            "journal": "Pattern Recognition",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "FRUIT DETECTION; FOUNDATION MODELS; KNOWLEDGE DISTILLATION; ZERO-SHOT LEARNING; AGRICULTURE"
+        },
+        {
+            "title": "Adaptive multi-teacher knowledge distillation framework with foundation models for medical image analysis",
+            "authors": "Liu, DD; Gao, Y; Zhang, NY; Wang, X; Zhang, TY; Fan, M; Sun, Y; Li, S; Tan, T",
+            "journal": "Computerized Medical Imaging And Graphics",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "MULTI-TEACHER KNOWLEDGE DISTILLATION; FOUNDATION MODELS; ADAPTIVE GATING MECHANISM; MEDICAL IMAGE ANALYSIS; MODEL COMPRESSION; DEEP LEARNING"
+        },
+        {
+            "title": "Low-resource knowledge graph completion based on knowledge distillation driven by large language models",
+            "authors": "Hou, WL; Zhao, WD; Jia, N; Liu, XH",
+            "journal": "Applied Soft Computing",
+            "year": 2025,
+            "citations": 10,
+            "keywords": "KNOWLEDGE GRAPH COMPLETION; KNOWLEDGE REASONING; LINK PREDICTION; LARGE LANGUAGE MODELS"
+        },
+        {
+            "title": "Low-Latency Federated Fine-Tuning for Large Language Models Over Wireless Networks",
+            "authors": "Pang, ZW; Wei, K; Shi, L; Wang, Z; Li, J; Shu, F",
+            "journal": "Ieee Wireless Communications Letters",
+            "year": 2026,
+            "citations": 1,
+            "keywords": "SERVERS; COMPUTATIONAL MODELING; ADAPTATION MODELS; CHANNEL ALLOCATION; UPLINK; DOWNLINK; BANDWIDTH; MINIMIZATION; COSTS; OPTIMIZATION; FEDERATED LEARNING; FINE-TUNING; LARGE LANGUAGE MODELS; BANDWIDTH ALLOCATIONS; PRUNING RATE"
+        },
+        {
+            "title": "LS-PRISM: A layer-selective pruning method via low-rank approximation and sparsification for efficient large language model compression",
+            "authors": "Tao, RS; Chen, HR; Guo, YZ; Wang, JK; Wang, BY; Ni, RR; Zhao, Y",
+            "journal": "Neural Networks",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "LARGE LANGUAGE MODELS (LLMS); MODEL COMPRESSION; LOW-RANK APPROXIMATION; UNSTRUCTURED PRUNING; SPARSIFICATION"
+        },
+        {
+            "title": "Mini-InternVL: a flexible-transfer pocket multi-modal model with 5% parameters and 90% performance",
+            "authors": "Gao, ZW; Chen, Z; Cui, ER; Ren, YM; Wang, WY; Zhu, JG; Tian, H; Ye, SL; He, JJ; Zhu, XZ; Lu, LW; Lu, T; Qiao, Y; Dai, JF; Wang, WH",
+            "journal": "Visual Intelligence",
+            "year": 2024,
+            "citations": 11,
+            "keywords": "LIGHTWEIGHT MULTI-MODAL LARGE LANGUAGE MODEL; VISION-LANGUAGE MODEL; KNOWLEDGE DISTILLATION; VISUAL INSTRUCTION TUNING"
+        },
+        {
+            "title": "Adaptive Pruning for Large Language Models With Structural Importance Awareness",
+            "authors": "Zheng, HT; Ren, JK; Han, YT; Sun, YS; Zhang, RC; Zhang, WB; Li, Z; Niyato, D; Cui, SG",
+            "journal": "IEEE INTERNET OF THINGS JOURNAL",
+            "year": 2026,
+            "citations": 1,
+            "keywords": "COMPUTATIONAL MODELING; ACCURACY; INTERNET OF THINGS; ADAPTATION MODELS; TUNING; UNCERTAINTY; PERFORMANCE EVALUATION; LARGE LANGUAGE MODELS; CROSS LAYER DESIGN; COSTS; FINE-TUNING; LARGE LANGUAGE MODEL (LLM); MODEL PRUNING; STRUCTURAL IMPORTANCE"
+        },
+        {
+            "title": "Lightweight Deep Learning for Resource-Constrained Environments: A Survey",
+            "authors": "Liu, HI; Galindo, M; Xie, HX; Wong, LK; Shuai, HH; Li, YH; Cheng, WH",
+            "journal": "Acm Computing Surveys",
+            "year": 2024,
+            "citations": 144,
+            "keywords": "LIGHTWEIGHT MODEL; EFFICIENT TRANSFORMER; MODEL COMPRESSION; QUANTIZATION; TINYML; LARGE LANGUAGE MODELS"
+        },
+        {
+            "title": "A Comprehensive Survey on Large Language Model Compression for Artificial Intelligence Applications in Edge Systems",
+            "authors": "Liang, YZ; Xu, CF; Mei, YX; Zou, HD; Guo, JX; Fan, XG; Wang, T; Huang, HY",
+            "journal": "IEEE INTERNET OF THINGS JOURNAL",
+            "year": 2026,
+            "citations": 1,
+            "keywords": "GPT-4O; UNMANNED GROUND VEHICLE (UGV); SELF-DRIVING; KNOWLEDGE DISTILLATION; OFF-ROAD DRIVING; DEEP LEARNING; LARGE LANGUAGE MODEL (LLM); EDGE BOARD"
+        },
+        {
+            "title": "GPT-4off: On-Board Traversability Probability Estimation for Off-Road Driving via GPT Knowledge Distillation",
+            "authors": "Kim, N; Choi, S; Choi, S; Lee, Y; Cheong, Y; An, J",
+            "journal": "Applied Sciences-Basel",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "QUANTIZATION (SIGNAL); OPTIMIZATION; ARTIFICIAL INTELLIGENCE; SURVEYS; COMPUTATIONAL MODELING; CLOUD COMPUTING; MODEL COMPRESSION; TRAINING; COLLABORATION; ADAPTATION MODELS; ARTIFICIAL INTELLIGENCE (AI); EDGE DEPLOYMENT OPTIMIZATION; EDGE-BASED LARGE LANGUAGE MODELS (LLMS); HYBRID COMPRESSION; MODEL COMPRESSION"
+        },
+        {
+            "title": "ROFED-LLM: Robust Federated Learning for Large Language Models in Adversarial Wireless Environments",
+            "authors": "Wang, HY; Yin, ZL; Chen, B; Zeng, YJ; Yan, XY; Zhou, CY; Li, AJ",
+            "journal": "IEEE TRANSACTIONS ON NETWORK SCIENCE AND ENGINEERING",
+            "year": 2026,
+            "citations": 10,
+            "keywords": "TRAINING; COMPUTATIONAL MODELING; DATA MODELS; PRIVACY; ADAPTATION MODELS; FEDERATED LEARNING; DIFFERENTIAL PRIVACY; ROBUSTNESS; PROTECTION; JAMMING; WIRELESS ENVIRONMENTS; COMMUNICATION EFFICIENCY; LARGE LANGUAGE MODELS (LLMS); FEDERATED LEARNING (FL); DATA PRIVACY PROTECTION; COMPLEX NETWORKS"
+        },
+        {
+            "title": "Probing the Pitfalls: Understanding SVD's Shortcomings in Language Model Compression",
+            "authors": "Pletenev, S",
+            "journal": "Journal Of Language And Education",
+            "year": 2024,
+            "citations": 0,
+            "keywords": "FACTORIZATION-BASED COMPRESSION; LARGE LANGUAGE MODEL OPTIMIZATION; LINGUISTIC REPRESENTATION PROBING; RESOURCE-EFFICIENT NLP"
+        },
+        {
+            "title": "A cognitive domain specific framework integrating large language model for COVID-19 vaccine sentiment analysis",
+            "authors": "Prasika, L; Rajan, SNE",
+            "journal": "Intelligent Data Analysis",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "TEXTUAL SENTIMENT ANALYSIS; LANGUAGE MODEL; RETRIEVAL AUGMENTED GENERATION; FINE TUNING"
+        },
+        {
+            "title": "A Survey of Quantization in LLM: Unlocking Potential Hardware Efficiency",
+            "authors": "Chen, YD; Zheng, KJ; Guo, ZH; Zhang, QH; Zhang, YH; Zhai, JD",
+            "journal": "Journal Of Computer Science And Technology",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "QUANTIZATION; LARGE LANGUAGE MODEL (LLM); MIXED-PRECISION; KERNEL GENERATION"
+        },
+        {
+            "title": "Distilcyphergpt: enhancing large language models for knowledge graph question answering in cypher through knowledge distillation",
+            "authors": "Chong, YL; Lee, CP; Lim, KM",
+            "journal": "Data Mining And Knowledge Discovery",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "KNOWLEDGE GRAPH; QUESTION ANSWERING; LANGUAGE MODEL; KNOWLEDGE DISTILLATION; GENERATIVE PRETRAINED TRANSFORMERS"
+        },
+        {
+            "title": "Quantize-Sample-and-Verify: LLM Acceleration via Adaptive Edge-Cloud Speculative Decoding",
+            "authors": "Zhang, GY; Cai, YL; Yu, GD; Popovski, P; Simeone, O",
+            "journal": "Ieee Communications Letters",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "SERVERS; VECTORS; QUANTIZATION (SIGNAL); UPLINK; DOWNLINK; ADAPTATION MODELS; DECODING; THROUGHPUT; PROTOCOLS; PROBABILITY DISTRIBUTION; EDGE-CLOUD SPECULATIVE DECODING; LARGE LANGUAGE MODELS; REINFORCEMENT LEARNING"
+        },
+        {
+            "title": "Automated Pruning Framework for Large Language Models Using Combinatorial Optimization",
+            "authors": "Ratsapa, P; Thonglek, K; Chantrapornchai, C; Ichikawa, K",
+            "journal": "Ai",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "LARGE LANGUAGE MODELS; MODEL PRUNING; PARTICLE SWARM OPTIMIZATION; RESOURCE-CONSTRAINED DEVICES; WHALE OPTIMIZATION ALGORITHM"
+        },
+        {
+            "title": "Vision-Language Models for Edge Networks: A Comprehensive Survey",
+            "authors": "Sharshar, A; Khan, LU; Ullah, W; Guizani, M",
+            "journal": "IEEE INTERNET OF THINGS JOURNAL",
+            "year": 2025,
+            "citations": 14,
+            "keywords": "COMPUTATIONAL MODELING; VISUALIZATION; SURVEYS; IMAGE EDGE DETECTION; ARTIFICIAL INTELLIGENCE; MEDICAL SERVICES; INTERNET OF THINGS; COMPUTER ARCHITECTURE; AUTONOMOUS VEHICLES; PERFORMANCE EVALUATION; EDGE COMPUTING; EFFICIENT FINE-TUNING; LARGE LANGUAGE MODELS (LLMS); TRANSFORMERS; VISION LANGUAGE MODELS"
+        },
+        {
+            "title": "An empirical study of LLaMA3 quantization: from LLMs to MLLMs",
+            "authors": "Huang, W; Zheng, XY; Ma, XD; Qin, HT; Lv, CT; Chen, H; Luo, J; Qi, XJ; Liu, XL; Magno, M",
+            "journal": "Visual Intelligence",
+            "year": 2024,
+            "citations": 15,
+            "keywords": "MODEL QUANTIZATION; LARGE LANGUAGE MODEL; MULTI-MODAL; DEEP LEARNING"
+        },
+        {
+            "title": "EdgeShard: Efficient LLM Inference via Collaborative Edge Computing",
+            "authors": "Zhang, MJ; Shen, XM; Cao, JN; Cui, ZY; Jiang, S",
+            "journal": "IEEE INTERNET OF THINGS JOURNAL",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "LARGE LANGUAGE MODEL (LLM); MULTI-MODAL DATA; COLLABORATIVE INFERENCE; REINFORCEMENT LEARNING; ANTI-JAMMING"
+        },
+        {
+            "title": "Collaborative Inference for Large Language Models Against Jamming Attacks",
+            "authors": "Lin, ZP; Xiao, L; Chen, HY; Xu, XY; Li, JL",
+            "journal": "Journal Of Electronics & Information Technology",
+            "year": 2025,
+            "citations": 75,
+            "keywords": "COMPUTATIONAL MODELING; CLOUD COMPUTING; COLLABORATION; MEMORY MANAGEMENT; SERVERS; EDGE COMPUTING; PERFORMANCE EVALUATION; BANDWIDTH; LOAD MODELING; OPTIMIZATION; CLOUD-EDGE-END COLLABORATION; EDGE ARTIFICIAL INTELLIGENCE (AI); EDGE COMPUTING; LARGE LANGUAGE MODELS (LLMS)"
+        },
+        {
+            "title": "Low-Latency PIM Accelerator for Edge LLM Inference",
+            "authors": "Wang, XY; Sun, XT; Li, WQ; Min, F; Zhang, XY; Zhang, XJ; Han, YH; Chen, XM",
+            "journal": "Ieee Computer Architecture Letters",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "RANDOM ACCESS MEMORY; LOW LATENCY COMMUNICATION; ENGINES; BANDWIDTH; VECTORS; REGISTERS; QUANTIZATION (SIGNAL); ENERGY EFFICIENCY; HARDWARE; COMPUTATIONAL MODELING; LARGE LANGUAGE MODEL INFERENCE; PROCESSING-IN-MEMORY; EDGE ACCELERATOR"
+        },
+        {
+            "title": "A review of state-of-the-art techniques for large language model compression",
+            "authors": "Dantas, PV; Cordeiro, LC; Junior, WSS",
+            "journal": "Complex & Intelligent Systems",
+            "year": 2025,
+            "citations": 3,
+            "keywords": "LARGE LANGUAGE MODEL COMPRESSION; KNOWLEDGE DISTILLATION; QUANTIZATION; PRUNING TECHNIQUES; NEURAL ARCHITECTURE SEARCH; RESOURCE-CONSTRAINED ENVIRONMENTS; SCALABLE AI SYSTEMS; FAIRNESS IN AI MODELS; ROBUSTNESS AGAINST ADVERSARIAL ATTACKS; EDGE COMPUTING; ADAPTIVE COMPRESSION; MULTI-OBJECTIVE OPTIMIZATION"
+        },
+        {
+            "title": "An empirical study of Qwen3 quantization",
+            "authors": "Zheng, XY; Li, YY; Chu, HR; Feng, Y; Ma, XD; Wang, ZN; Luo, J; Guo, JY; Qin, HT; Magno, M; Liu, XL",
+            "journal": "Visual Intelligence",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "QUANTIZATION; LARGE LANGUAGE MODELS; MODEL COMPRESSION; DEEP LEARNING"
+        },
+        {
+            "title": "Mosaic: Composite projection pruning for resource-efficient LLMs",
+            "authors": "Eccles, BJ; Wong, L; Varghese, B",
+            "journal": "Future Generation Computer Systems-The International Journal Of Escience",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "THREE-DIMENSIONAL DISPLAYS; HEURISTIC ALGORITHMS; NONVOLATILE MEMORY; RANDOM ACCESS MEMORY; FERROELECTRIC FILMS; IN-MEMORY COMPUTING; COMPUTER ARCHITECTURE; COMMON INFORMATION MODEL (COMPUTING); COMPUTATIONAL EFFICIENCY; ACCURACY; 3-D FERROELECTRIC (FE)-BASED MEMORY; COMPUTING-IN-MEMORY (CIM); KEY-VALUE (KV) CACHE; LARGE LANGUAGE MODEL (LLM)"
+        },
+        {
+            "title": "3-D 1T-nC-1T Ferroelectric-Based KV Cache for Efficient Long-Context LLM Inference",
+            "authors": "Xu, WK; Luo, DY; Deng, MY; Cao, SJ; Zhong, SZ; Li, M; Huang, QQ; Huang, R",
+            "journal": "Ieee Transactions On Electron Devices",
+            "year": 2026,
+            "citations": 2,
+            "keywords": "COMPOSITE PROJECTION PRUNING; EDGE COMPUTING; MODEL COMPRESSION; LARGE LANGUAGE MODELS; MODEL PRUNING; RESOURCE-EFFICIENT LLM"
+        },
+        {
+            "title": "Sensor Fusion for Target Detection Using LLM-Based Transfer Learning Approach",
+            "authors": "Ziv, Y; Matzliach, B; Ben-Gal, I",
+            "journal": "Entropy",
+            "year": 2025,
+            "citations": 3,
+            "keywords": "SERVERS; TRAINING; COMPUTATIONAL MODELING; OPTIMIZATION; PERFORMANCE EVALUATION; COLLABORATION; ARTIFICIAL NEURAL NETWORKS; INFERENCE ALGORITHMS; MODEL COMPRESSION; WIRELESS NETWORKS; COLLABORATIVE FINE-TUNING; HETEROGENEOUS NETWORKS; LARGE LANGUAGE MODELS; SPLIT LEARNING"
+        },
+        {
+            "title": "Lightweight misbehavior detection in the internet of vehicles using knowledge distillation from large language models",
+            "authors": "Aishwarya, R; Vetriselvi, V; Gladys, A; Prahmodh, R",
+            "journal": "Computer Networks",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "MISBEHAVIOR DETECTION SYSTEM; KNOWLEDGE DISTILLATION; LARGE LANGUAGE MODEL; DATA GENERATION; INTERNET OF VEHICLES"
+        },
+        {
+            "title": "Split Learning Based Cloud-Edge-End Collaborative Model Training in Heterogeneous Networks",
+            "authors": "Wang, J; Feng, G; Liu, YJ; Xu, XY; Cheng, L; Jiang, W; Qian, LP",
+            "journal": "IEEE TRANSACTIONS ON NETWORK SCIENCE AND ENGINEERING",
+            "year": 2026,
+            "citations": 1,
+            "keywords": "SEARCH AND DETECTION; SENSOR FUSION; MOBILE AGENTS; NEURAL NETWORKS; DEEP LEARNING; LARGE LANGUAGE MODELS; TRANSFER LEARNING; DISTILLATION"
+        },
+        {
+            "title": "Split Fine-Tuning for Large Language Models in Wireless Networks",
+            "authors": "Zhang, SG; Cheng, GL; Wu, W; Huang, XY; Song, LY; Shen, XM",
+            "journal": "Ieee Journal Of Selected Topics In Signal Processing",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "6G EDGE INTELLIGENCE; NEUROMORPHIC COMPUTING; SEMANTIC COMMUNICATION; LARGE LANGUAGE MODELS (LLMS); SPIKING NEURAL NETWORKS (SNNS); RESOURCE-AWARE AGENTS; COGNITIVE EDGE COMPUTING"
+        },
+        {
+            "title": "NEUROMORPHIC-INSPIRED HYBRID COGNITIVE MODEL FOR SELF-OPTIMIZING RESOURCE MANAGEMENT IN 6G EDGE NETWORKS",
+            "authors": "Kollinal, RK; Cheeran, MT",
+            "journal": "Archives For Technical Sciences",
+            "year": 2025,
+            "citations": 7,
+            "keywords": "SERVERS; LORA; COMPUTATIONAL MODELING; DELAYS; TRAINING; MOBILE HANDSETS; TRANSFORMERS; ADAPTATION MODELS; MEMORY MANAGEMENT; RESOURCE MANAGEMENT; LARGE LANGUAGE MODELS; FINE-TUNING; SPLIT LEARNING; RESOURCE MANAGEMENT"
+        },
+        {
+            "title": "Lightweight and Post-Training Structured Pruning for On-Device Large Language Models",
+            "authors": "Xu, ZH; Xu, Y; Xu, HL; Liao, YM; Yao, ZW; Xie, Z",
+            "journal": "IEEE TRANSACTIONS ON MOBILE COMPUTING",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "NEURONS; COMPUTATIONAL MODELING; LOAD MODELING; ACCURACY; MEMORY MANAGEMENT; HARDWARE; ADAPTATION MODELS; PRINCIPAL COMPONENT ANALYSIS; PERFORMANCE EVALUATION; MOBILE COMPUTING; LARGE LANGUAGE MODELS; MATRIX CONDITION; POST-TRAINING PRUNING; STRUCTURED PRUNING"
+        },
+        {
+            "title": "A Survey on Deep Neural Network Pruning: Taxonomy, Comparison, Analysis, and Recommendations",
+            "authors": "Cheng, HR; Zhang, M; Shi, JQ",
+            "journal": "Ieee Transactions On Pattern Analysis And Machine Intelligence",
+            "year": 2024,
+            "citations": 267,
+            "keywords": "TRAINING; NEURAL NETWORKS; ARTIFICIAL NEURAL NETWORKS; SURVEYS; TAXONOMY; REVIEWS; COMPUTATIONAL MODELING; DEEP NEURAL NETWORK PRUNING; MODEL COMPRESSION; MODEL ACCELERATION; LARGE LANGUAGE MODELS; VISION TRANSFORMERS; LARGE MULTIMODAL MODELS; DIFFUSION MODELS; EDGE DEVICES"
+        },
+        {
+            "title": "AI-Driven Penetration Testing for ARM Systems: Experimental Evaluation and Deployment Framework Across Four Paradigms",
+            "authors": "Ragsdale, M; Ramasamy, V",
+            "journal": "IEEE ACCESS",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "PAYLOADS; FEEDS; ANTENNAS; CENTRAL PROCESSING UNIT; FILTERING; FILTERS; SYSTEM-ON-CHIP; ELECTRONIC CIRCUITS; MICROPROCESSORS; MICROCONTROLLERS; ARM ARCHITECTURE; ARTIFICIAL NEURAL NETWORKS; CYBERSECURITY; DEEP LEARNING; EDGE COMPUTING; INTERNET OF THINGS; LARGE LANGUAGE MODELS; MACHINE LEARNING; PENETRATION TESTING; REINFORCEMENT LEARNING"
+        },
+        {
+            "title": "Beyond the Cloud: Edge Inference for Generative Large Language Models in Wireless Networks",
+            "authors": "Zhang, XY; Nie, JT; Huang, YD; Xie, GC; Xiong, ZH; Liu, J; Niyato, D; Shen, XM",
+            "journal": "Ieee Transactions On Wireless Communications",
+            "year": 2025,
+            "citations": 36,
+            "keywords": "COMPUTATIONAL MODELING; QUANTIZATION (SIGNAL); ACCURACY; INFERENCE ALGORITHMS; THROUGHPUT; WIRELESS NETWORKS; TRANSFORMERS; RESOURCE MANAGEMENT; OPTIMIZATION; CHATBOTS; GENERATIVE AI; EDGE INFERENCE; WIRELESS NETWORKS; MULTIUSER EDGE COMPUTING"
+        },
+        {
+            "title": "Imp: Highly Capable Large Multimodal Models for Mobile Devices",
+            "authors": "Shao, ZW; Yu, Z; Yu, J; Ouyang, XC; Zheng, LH; Gai, ZB; Wang, MY; Kuang, ZZ; Ding, JJ",
+            "journal": "Ieee Transactions On Multimedia",
+            "year": 2025,
+            "citations": 4,
+            "keywords": "VISUALIZATION; TRAINING; DATA MODELS; COMPUTER ARCHITECTURE; COMPUTATIONAL MODELING; TRAINING DATA; CONNECTORS; LARGE LANGUAGE MODELS; MOBILE HANDSETS; BENCHMARK TESTING; LARGE MULTIMODAL MODELS; LLM; MOBILE DEVICES; MULTIMODAL LEARNING; VISION-LANGUAGE MODELS"
+        },
+        {
+            "title": "Pirate-GPT: A locally deployed large language model framework for reliable offline anti-piracy decision support and knowledge retrieval in maritime operations",
+            "authors": "Liu, XL; Hu, JH; Mei, Q; Wang, SH",
+            "journal": "Reliability Engineering & System Safety",
+            "year": 2026,
+            "citations": 3,
+            "keywords": "ANTI-PIRACY DECISION; LOCALIZED DEPLOYMENT; PIRACY-RELATED KNOWLEDGE; QUESTION-ANSWERING SYSTEM"
+        },
+        {
+            "title": "Tiny Language Models for Automation and Control: Overview, Potential Applications, and Future Research Directions",
+            "authors": "Lamaakal, I; Maleh, Y; El Makkaoui, K; Ouahbi, I; Plawiak, P; Alfarraj, O; Almousa, M; El-Latif, AAA",
+            "journal": "Sensors",
+            "year": 2025,
+            "citations": 22,
+            "keywords": "EDGE COMPUTING; IOT; MODEL COMPRESSION; OPTIMIZATION; SMALL LANGUAGE MODELS; TINY LANGUAGE MODELS; LARGE LANGUAGE MODELS"
+        },
+        {
+            "title": "Interpretable Chinese Fake News Detection With Chain-of-Thought and In-Context Learning",
+            "authors": "Liu, BY; Wang, AQ; Xia, CQ",
+            "journal": "IEEE ACCESS",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "FAKE NEWS; FEATURE EXTRACTION; TRAINING; COGNITION; SOCIAL NETWORKING (ONLINE); LARGE LANGUAGE MODELS; COMPUTATIONAL MODELING; BLOGS; ACCURACY; SEMANTICS; FAKE NEWS DETECTION; LARGE LANGUAGE MODEL; KNOWLEDGE DISTILLATION; INTERPRETABILITY"
+        },
+        {
+            "title": "Dynamic token pruning for LLMs: leveraging task-specific attention and adaptive thresholds",
+            "authors": "Ahmadpanah, SH; Sobhanloo, S; Afsharfarnia, P",
+            "journal": "Knowledge And Information Systems",
+            "year": 2025,
+            "citations": 3,
+            "keywords": "LARGE LANGUAGE MODEL; DYNAMIC TOKEN PRUNING; TASK-SPECIFIC OPTIMIZATION; NATURAL LANGUAGE PROCESSING; MODEL EFFICIENCY"
+        },
+        {
+            "title": "Efficient LLM Deployment in Consumer Electronics Applications via Resource-Aware and Salience-Guided Quantization",
+            "authors": "Pang, TF; Mao, YC; Pan, ZX; Qi, RZ; Zhang, BT; He, XM; Wu, J",
+            "journal": "Ieee Transactions On Consumer Electronics",
+            "year": 2026,
+            "citations": 11,
+            "keywords": "IMAGE EDGE DETECTION; SENSORS; INTERNET OF THINGS; DATA ANALYSIS; REAL-TIME SYSTEMS; ARTIFICIAL INTELLIGENCE; IMAGE SENSORS; COMPUTATIONAL MODELING; IRRIGATION; EDGE COMPUTING; CLIMATE CHANGE; AGRICULTURE INTERNET OF THINGS; SMART AGRICULTURE; LARGE LANGUAGE MODEL; EDGE COMPUTING; MULTIMODAL DATA ANALYTICS; KNOWLEDGE DISTILLATION"
+        },
+        {
+            "title": "Federated Fine-Tuning of LLMs: Framework Comparison and Research Directions",
+            "authors": "Yan, N; Su, Y; Deng, YS; Schober, R",
+            "journal": "Ieee Communications Magazine",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "LARGE LANGUAGE MODELS; QUANTIZATION; INTEGER PRECISION INFERENCE; TEXT GENERATION; CODE GENERATION; HARDWARE CONFIGURATION"
+        },
+        {
+            "title": "Terafly: A Multinode FPGA-Based Accelerator Design for Efficient Cooperative Inference in LLMs",
+            "authors": "Zheng, JN; Chen, G; Huang, LB; Lou, X; Zheng, WS",
+            "journal": "Ieee Transactions On Computer-Aided Design Of Integrated Circuits And Systems",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "FEDERATED LEARNING; LARGE LANGUAGE MODELS; RESEARCH INITIATIVES; DATA PRIVACY; COMPUTATIONAL MODELING; ANALYTICAL MODELS; PERFORMANCE METRICS; COMPUTATIONAL EFFICIENCY"
+        },
+        {
+            "title": "Farm-LightSeek: An Edge-Centric Multimodal Agricultural IoT Data Analytics Framework With Lightweight LLMs",
+            "authors": "Jiang, DW; Shen, ZS; Zheng, QS; Zhang, TH; Xiang, W; Jin, J",
+            "journal": "Ieee Internet Of Things Magazine",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "QUANTIZATION (SIGNAL); MOBILE HANDSETS; COMPUTATIONAL MODELING; ACCURACY; RESOURCE MANAGEMENT; HARDWARE; TRAINING; COSTS; OPTIMIZATION; CONSUMER ELECTRONICS; LARGE LANGUAGE MODEL; MODEL COMPRESSION; QUANTIZATION"
+        },
+        {
+            "title": "Quantized Transformers in Practice: Benchmarking Full-and Low-Precision LLMs across Two Processors",
+            "authors": "Oprea, SV; B\u00e2ra, A",
+            "journal": "Cmc-Computers Materials & Continua",
+            "year": 2026,
+            "citations": 1,
+            "keywords": "COMPUTER ARCHITECTURE; COMPUTATIONAL MODELING; FIELD PROGRAMMABLE GATE ARRAYS; QUANTIZATION (SIGNAL); HARDWARE; THROUGHPUT; INTEGRATED CIRCUIT MODELING; EARTH; ADAPTATION MODELS; VECTORS; FPGA; HARDWARE ACCELERATION; HIGH-LEVEL SYNTHESIS (HLS); LARGE LANGUAGE MODELS (LLMS)"
+        },
+        {
+            "title": "Efficient Deep Learning Infrastructures for Embedded Computing Systems: A Comprehensive Survey and Future Envision",
+            "authors": "Luo, XZ; Liu, D; Kong, H; Huai, S; Chen, H; Xiong, GC; Liu, WC",
+            "journal": "Acm Transactions On Embedded Computing Systems",
+            "year": 2025,
+            "citations": 2,
+            "keywords": "DEEP LEARNING; TRANSFORMER ENCODERS; INFERENCE; QUANTIZATION; MATRIX MULTIPLICATION; MULTICORE CPUS"
+        },
+        {
+            "title": "Characterization of quantized inference with transformer encoders on low power CPUs",
+            "authors": "Mart\u00ednez, H; Catal\u00e1n, S; Castell\u00f3, A; Quintana-Orti, ES",
+            "journal": "International Journal Of High Performance Computing Applications",
+            "year": 2025,
+            "citations": 11,
+            "keywords": "EMBEDDED COMPUTING SYSTEMS; EMBEDDED INTELLIGENCE; ARTIFICIAL INTELLI -GENCE; EFFICIENT DEEP LEARNING ALGORITHMS; EFFICIENT NETWORK DESIGN; EFFICIENT NEURAL ARCHITECTURE SEARCH; EFFI- CIENT MODEL COMPRESSION; EFFICIENT ON-DEVICE LEARNING; EFFICIENT LARGE LANGUAGE MODELS; EFFICIENT DEEP LEARNING SOFTWARE AND HARDWARE; INTELLIGENT EMBEDDED APPLICATIONS"
+        },
+        {
+            "title": "Vehicle-Scale LLMs: Integrating low-rank residuals and 4-bit quantization for in-vehicle AI",
+            "authors": "Parashar, A; Parashar, A; Joshi, B; Jhajharia, K; Sinha, A",
+            "journal": "Array",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "LARGE LANGUAGE MODELS; 4-BIT QUANTIZATION; ADAPTER COMPENSATION; EDGE AI; INTELLIGENT TRANSPORTATION SYSTEMS"
+        },
+        {
+            "title": "MobiLLM: Enabling On-Device Fine-Tuning of Billion-Sized LLMs via Server-Assisted Side-Tuning",
+            "authors": "Li, L; Yang, XK; Wu, W; Wang, H; Ohtsuki, T; Fu, X; Pan, M; Shen, XM",
+            "journal": "Ieee Journal Of Selected Topics In Signal Processing",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "LARGE LANGUAGE MODELS; PARAMETER-EFFICIENT FINE-TUNING; LORA; QLORA; FINANCIAL SENTIMENT ANALYSIS; LLAMA; HIGH-PERFORMANCE COMPUTING; RESOURCE EFFICIENCY"
+        },
+        {
+            "title": "Empirical Analysis of Internal Hallucination Detection in Quantized LLMs: Layer Dynamics and White-Box Benchmarks",
+            "authors": "Liu, HH; Xu, JL",
+            "journal": "Electronics",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "HALLUCINATION ANALYSIS; WHITE-BOX EVALUATION; MAHALANOBIS DISTANCE; LAYER DYNAMICS; QUANTIZED LARGE LANGUAGE MODELS; EDGE DEPLOYMENT"
+        },
+        {
+            "title": "Parameter-efficient fine-tuning of LLaMA models for financial sentiment classification",
+            "authors": "Toksoz, SB; Isik, G",
+            "journal": "Cluster Computing-The Journal Of Networks Software Tools And Applications",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "MOBILE HANDSETS; COMPUTATIONAL MODELING; TRAINING; SERVERS; BACKPROPAGATION; MEMORY MANAGEMENT; PIPELINES; TUNING; INTERNET; ELECTRONIC MAIL; LARGE LANGUAGE MODEL; TRANSFORMER; ON-DEVICE FINE-TUNING; MEMORY EFFICIENCY"
+        },
+        {
+            "title": "Nano large language model of 125 million-parameter for STEM education",
+            "authors": "Pradhan, Y; Singh, A; Kulkarni, N; Priyadarshi, A; Rajale, O; Mohite, K",
+            "journal": "Discover Computing",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "LIGHTWEIGHT; TRANSFORMER; KNOWLEDGE-DISTILLATION; QUANTIZATION; EDGE"
+        },
+        {
+            "title": "Efficient Biomedical Text Summarization With Quantized LLaMA 2: Enhancing Memory Usage and Inference on Low Powered Devices",
+            "authors": "Kumar, S; Ranjan, V; Chakrabarti, A; Das, TK; Singh, A",
+            "journal": "Expert Systems",
+            "year": 2025,
+            "citations": 2,
+            "keywords": "DEEP LEARNING; EDGE DEVICES; LLAMA 2; MEMORY USAGE; NATURAL LANGUAGE PROCESSING (NLP); NON-SERVER DEVICES; QUANTIZATION BIOMEDICAL TEXT SUMMARIZATION"
+        },
+        {
+            "title": "Toward Democratized Generative AI in Next-Generation Mobile Edge Networks",
+            "authors": "Zhang, RC; He, JY; Luo, XF; Niyato, D; Kang, JW; Xiong, ZH; Li, YH; Sikdar, B",
+            "journal": "Ieee Network",
+            "year": 2025,
+            "citations": 30,
+            "keywords": "GENERATIVE AI; ARTIFICIAL INTELLIGENCE; COMPUTATIONAL MODELING; ADAPTATION MODELS; PERFORMANCE EVALUATION; TRAINING; QUANTIZATION (SIGNAL); MOBILE HANDSETS; MEMORY MANAGEMENT; BIOLOGICAL SYSTEM MODELING; DEMOCRATIZED AI; GENERATIVE AI; LLM; COMPACT MODEL; MOBILE EDGE NETWORKS"
+        },
+        {
+            "title": "eDKM: An Efficient and Accurate Train-Time Weight Clustering for Large Language Models",
+            "authors": "Cho, MS; Vahid, KA; Fu, QC; Adya, S; Mundo, CCD; Rastegari, M; Naik, D; Zatloukal, P",
+            "journal": "Ieee Computer Architecture Letters",
+            "year": 2024,
+            "citations": 5,
+            "keywords": "TENSORS; MEMORY; SHARDING; OPTIMIZATION; INDEXES; GRAPHICS PROCESSING UNITS; COMPLEXITY THEORY; COMPUTATIONAL AND ARTIFICIAL INTELLIGENCE; ARTIFICIAL INTELLIGENCE; LEARNING SYSTEMS; MACHINE LEARNING; DEEP LEARNING"
+        },
+        {
+            "title": "AEMC: Aggregator-efficient model compression for streamlining LLMs",
+            "authors": "Zhou, MR; Mao, R; Sripada, S; Li, X",
+            "journal": "Neurocomputing",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "DEEP PRUNING; MODEL COMPRESSIONS; NATURAL LANGUAGE PROCESSING (NLP); MACHINE LEARNING"
+        },
+        {
+            "title": "Chat-ePRO: Development and pilot study of an electronic patient-reported outcomes system based on ChatGPT",
+            "authors": "Chen, ZK; Wang, QC; Sun, YQ; Cai, HL; Lu, XD",
+            "journal": "Journal Of Biomedical Informatics",
+            "year": 2024,
+            "citations": 9,
+            "keywords": "PATIENT REPORTED OUTCOME MEASURES; LARGE LANGUAGE MODEL; KNOWLEDGE DISTILLATION; BREAST CANCER; MOBILE HEALTH"
+        },
+        {
+            "title": "Sustainable LLM Inference for Edge AI: Evaluating Quantized LLMs for Energy Efficiency, Output Accuracy, and Inference Latency",
+            "authors": "Husom, EJ; Goknil, A; Astekin, M; Shar, LK; K\u00e5sen, A; Sen, S; Mithassel, BA; Soylu, A",
+            "journal": "Acm Transactions On Internet Of Things",
+            "year": 2025,
+            "citations": 3,
+            "keywords": "LLMS; QUANTIZED MODELS; EDGE AI; ENERGY EFFICIENCY; EDGE COMPUTING; SUSTAINABILITY"
+        },
+        {
+            "title": "HAPE: Hardware-Aware LLM Pruning For Efficient On-Device Inference Optimization",
+            "authors": "Zhao, WQ; Zou, LC; Wang, ZX; Yao, XF; Yu, B",
+            "journal": "Acm Transactions On Design Automation Of Electronic Systems",
+            "year": 2025,
+            "citations": 1,
+            "keywords": "LLM COMPRESSION; HARDWARE-AWARE COMPRESSION; ON-DEVICE INFERENCE OPTIMIZATION"
+        },
+        {
+            "title": "From Tiny Machine Learning to Tiny Deep Learning: A Survey",
+            "authors": "Somvanshi, S; Islam, MM; Chhetri, G; Chakraborty, R; Mimi, MS; Shuvo, SA; Islam, KS; Javed, S; Rafat, SA; Dutta, A; Das, S",
+            "journal": "Acm Computing Surveys",
+            "year": 2026,
+            "citations": 5,
+            "keywords": "TINY MACHINE LEARNING; TINY DEEP LEARNING; EDGE AI; EMBEDDED DEEP LEARNING"
+        },
+        {
+            "title": "Implementation of language models within an infrastructure designed for Natural Language Processing",
+            "authors": "Walkowiak, B; Walkowiak, T",
+            "journal": "International Journal Of Electronics And Telecommunications",
+            "year": 2024,
+            "citations": 3,
+            "keywords": "LANGUAGE MODEL DEPLOYMENT; QUANTIZATION; LLAMA- 2; E5 MODEL; ONNX; LLAMA.CPP; CLARIN-PL"
+        },
+        {
+            "title": "Latency-Critical Quantized Inference With Transformer Decoders on ARM and RISC-V CPUs",
+            "authors": "Mart\u00ednez, H; Catal\u00e1n, S; Castell\u00f3, A; Mestre, JI; Quintana-Ort\u00ed, ES",
+            "journal": "IEEE INTERNET OF THINGS JOURNAL",
+            "year": 2025,
+            "citations": 2,
+            "keywords": "DECODING; TRANSFORMERS; QUANTIZATION (SIGNAL); PROGRAM PROCESSORS; KERNEL; OPTIMIZATION; COMPUTATIONAL MODELING; ARITHMETIC; COSTS; VECTORS; DEEP LEARNING (DL); EDGE PLATFORMS; INFERENCE; MULTICORE CPUS; QUANTIZATION; TRANSFORMER DECODERS"
+        },
+        {
+            "title": "CRVQ: Channel-Relaxed Vector Quantization for Extreme Compression of LLMs",
+            "authors": "Xu, YZ; Ji, SY; Zhu, QF; Che, WX",
+            "journal": "Transactions Of The Association For Computational Linguistics",
+            "year": 2025,
+            "citations": 0,
+            "keywords": ""
+        },
+        {
+            "title": "Deep Compression on Segment Anything Model for Efficient Industrial Manufacturing",
+            "authors": "Zheng, Y; Liu, J; Li, Q; Li, JY; Xi, ZH",
+            "journal": "Ieee Transactions On Automation Science And Engineering",
+            "year": 2026,
+            "citations": 1,
+            "keywords": "QUANTIZATION (SIGNAL); TRAINING; IMAGE SEGMENTATION; FOUNDATION MODELS; DATA MODELS; COMPUTER VISION; ADAPTATION MODELS; VISUALIZATION; TRANSFORMERS; PERFORMANCE EVALUATION; SEGMENT ANYTHING MODEL; WEIGHT INITIALIZATION; KNOWLEDGE DISTILLATION; MODEL QUANTIZATION"
+        },
+        {
+            "title": "Domain aware post training quantization for vision transformers in deployment",
+            "authors": "Wang, L; Zeng, C; Zhang, M; Wu, JL; Nie, LQ",
+            "journal": "Pattern Recognition",
+            "year": 2026,
+            "citations": 2,
+            "keywords": "QUANTIZATION; DOMAIN ADAPTATION"
+        },
+        {
+            "title": "Guiding multimodal LLMs for efficient visual place recognition",
+            "authors": "He, ZJ; Li, WB; Cheng, JT; Zhang, YP; Vong, CM; Wu, J; Chen, XYL",
+            "journal": "Pattern Recognition Letters",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "LLM; PLACE RECOGNITION; ROBOTICS; TOKEN PRUNING"
+        },
+        {
+            "title": "Sometimes Painful but Promising: Feasibility and Trade-Offs of On-Device Language Model Inference",
+            "authors": "Abstreiter, M; Tarkoma, S; Morabito, R",
+            "journal": "Acm Transactions On Embedded Computing Systems",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "EDGE AI; SMALL LANGUAGE MODELS (SLMS); LARGE LANGUAGE MODELS (LLMS); EMBEDDED AI; GENERATIVE AI; BENCHMARKING"
+        },
+        {
+            "title": "Game-Based LLM Inference Task Offloading for Edge Computing System",
+            "authors": "Hou, SL; Gan, M; Ni, W; Zhai, ZY; Liu, XL",
+            "journal": "Ieee Transactions On Green Communications And Networking",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "LLM SPARSITY; GPU ARCHITECTURE EXTENSION; ALGORITHM-ARCHITECTURE CO-DESIGN; AI-DRIVEN NETWORK SECURITY; EDGE COMPUTING"
+        },
+        {
+            "title": "SPARTA: Sparse Parallel Architecture for Real-Time Threat Analysis for Lightweight Edge Network Defense",
+            "authors": "Li, S; Mi, XY; Zhang, L; Lu, Y",
+            "journal": "Future Internet",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "GRPO ALGORITHM; KNOWLEDGE DISTILLATION; KNOWLEDGE DISTILLATION; INFORMATION EXTRACTION; INFORMATION EXTRACTION; MILITARY INFORMATION TEXT; MILITARY INFORMATION TEXT; MILITARY INFORMATION TEXT"
+        },
+        {
+            "title": "A GRPO-Based Approach to Hierarchical Knowledge Distillation in Military Information Extraction",
+            "authors": "Yang, Y; Li, ZY; Li, LS; Wang, GS; Hu, Y; Peng, X; Li, YX",
+            "journal": "IEEE ACCESS",
+            "year": 2025,
+            "citations": 1,
+            "keywords": "FPGA; HLS; LLM; TERNARY NEURAL NETWORK; POWER OPTIMIZATION; EMBEDDED SYSTEMS; ZCU102"
+        },
+        {
+            "title": "Reducing Energy Footprint of LLM Inference Through FPGA-Based Heterogeneous Computing Platforms",
+            "authors": "Monteiro, TC; Guerrieri, A",
+            "journal": "Electronics",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "SERVERS; EDGE COMPUTING; COMPUTATIONAL MODELING; QUANTIZATION (SIGNAL); OPTIMIZATION; INFERENCE ALGORITHMS; MEMORY MANAGEMENT; DELAYS; GAMES; PREDICTIVE MODELS; LLM INFERENCE TASK OFFLOADING; QUANTIZATION; GAME THEORY"
+        },
+        {
+            "title": "Heterogeneous Binary Pixel Difference Networks for Remote Sensing Object Detection",
+            "authors": "Zhan, JL; Bai, L; Zhang, JH; Liu, TP; Shi, F; Liu, YX; Liu, L",
+            "journal": "Ieee Transactions On Geoscience And Remote Sensing",
+            "year": 2025,
+            "citations": 5,
+            "keywords": "REMOTE SENSING; FEATURE EXTRACTION; OBJECT DETECTION; DETECTORS; CONVOLUTION; COMPUTATIONAL MODELING; KERNEL; IMAGE EDGE DETECTION; ACCURACY; QUANTIZATION (SIGNAL); BINARIZATION; BINARY NEURAL NETWORKS (BNNS); LOCAL BINARY PATTERNS (LBPS); OBJECT DETECTORS; REMOTE SENSING"
+        },
+        {
+            "title": "Empowering Edge Intelligence: A Comprehensive Survey on On-Device AI Models",
+            "authors": "Wang, XB; Tang, ZQ; Guo, JX; Meng, TH; Wang, CH; Wang, T; Jia, WJ",
+            "journal": "Acm Computing Surveys",
+            "year": 2025,
+            "citations": 85,
+            "keywords": "GENERAL AND REFERENCE; SURVEYS AND OVERVIEWS; COMPUTING METHODOLOGIES; ARTIFICIAL INTELLIGENCE; MACHINE LEARNING"
+        },
+        {
+            "title": "FairQuanti: Enhancing Fairness in Deep Neural Network Quantization via Neuron Role Contribution",
+            "authors": "Chen, JY; Cao, ZQ; Wang, XJ; Zheng, HB; Ming, ZY; Zheng, YY",
+            "journal": "Acm Transactions On Privacy And Security",
+            "year": 2025,
+            "citations": 0,
+            "keywords": ""
+        },
+        {
+            "title": "QuFiH: Hybrid low-bit quantization and block-level parameter efficient fine-tuning for video hashing",
+            "authors": "Li, FD; Zhou, YX; Yang, QL; Chen, Y; Zhang, DL; Li, XL",
+            "journal": "Information Processing & Management",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "LEARNING TO HASH; VIDEO RETRIEVAL; QUANTIZATION; MULTIMODAL IR"
+        },
+        {
+            "title": "SoftwareHardware Co-Design for Real-Time Speech Translation on Resource-Constrained NPUs",
+            "authors": "Choi, G; Shin, H; Shin, C; Oh, EJ; Kwak, N",
+            "journal": "IEEE ACCESS",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "TRANSLATION; REAL-TIME SYSTEMS; QUANTIZATION (SIGNAL); PIPELINES; DECODING; HARDWARE; VOICE ACTIVITY DETECTION; COMPUTATIONAL MODELING; PIPELINE PROCESSING; OPTIMIZATION; ASR-MT INTEGRATION; ENCODER-SIDE KV CACHING; HARDWARE-AWARE QUANTIZATION; MIXED-PRECISION INFERENCE; NPU OPTIMIZATION; REAL-TIME STREAMING SPEECH TRANSLATION; RESOURCE-CONSTRAINED DEVICES; SOFTWARE-HARDWARE CO-DESIGN"
+        },
+        {
+            "title": "Divide and conquer: Optimizing code Chain-of-Thought in Small Language Model",
+            "authors": "Shen, YH; Yang, G; Sun, YF",
+            "journal": "Engineering Applications Of Artificial Intelligence",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "CHAIN-OF-THOUGHT REASONING; CODE GENERATION; SMALL LANGUAGE MODEL; EMPIRICAL STUDY; KNOWLEDGE DISTILLATION"
+        },
+        {
+            "title": "Fine-Grained Structured Sparse Computing for FPGA-Based AI Inference",
+            "authors": "Zhang, C; Cao, SJ; Dai, GH; Geng, CB; Yao, ZL; Xiao, WC; Liu, YX; Wu, M; Zhang, LT; Sun, GY; Ji, ZG; Wang, RS; Huang, R",
+            "journal": "Ieee Transactions On Computer-Aided Design Of Integrated Circuits And Systems",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "TRANSFORMERS; MATRIX DECOMPOSITION; NEURONS; ARTIFICIAL NEURAL NETWORKS; VECTORS; COMPUTATIONAL MODELING; TRAINING; RESOURCE MANAGEMENT; QUANTIZATION (SIGNAL); COVARIANCE MATRICES; LANGUAGE MODELS; NEURAL NETWORK COMPRESSION; NEURON IMPORTANCE; SVD"
+        },
+        {
+            "title": "Compressing What Matters: Neuron Importance Meets Data-Aware Low Rank Approximation for Language Model Compression",
+            "authors": "Ntovas, A; Doumanoglou, A; Drakoulis, P; Zarpalas, D",
+            "journal": "IEEE ACCESS",
+            "year": 2026,
+            "citations": 2,
+            "keywords": "HARDWARE; COMPUTATIONAL MODELING; INTEGRATED CIRCUIT MODELING; ACCURACY; FIELD PROGRAMMABLE GATE ARRAYS; DESIGN AUTOMATION; SPARSE MATRICES; DATA MODELS; REDUNDANCY; GRAPHICAL MODELS; CONVOLUTIONAL NEURAL NETWORKS (CNNS); FPGA ACCELERATOR; LARGE LANGUAGE MODELS (LLMS); LOW-LATENCY AI INFERENCE; RECURRENT NEURAL NETWORKS (RNNS); SPARSE COMPUTING"
+        },
+        {
+            "title": "In Situ Quantization with Memory-Transistor Transfer Unit Based on Electrochemical Random-Access Memory for Edge Applications",
+            "authors": "Yang, Z; Yang, YX; Wang, BQ; Tao, YY; Pan, ZL; Cai, L; Zhang, T; Yan, LH; Li, XB; Yang, YC",
+            "journal": "Advanced Science",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "ECRAM; EDGE COMPUTING; IN-MEMORY COMPUTING; WEIGHT QUANTIZATION"
+        },
+        {
+            "title": "Systematic Analysis of Retrieval-Augmented Generation-Based LLMs for Medical Chatbot Applications",
+            "authors": "Bora, A; Cuay\u00e1huitl, H",
+            "journal": "Machine Learning And Knowledge Extraction",
+            "year": 2024,
+            "citations": 24,
+            "keywords": "LARGE LANGUAGE MODELS (LLMS); MEDICAL CHATBOTS; FINE-TUNING; QUANTIZATION OF LLMS; RETRIEVAL-AUGMENTED GENERATION (RAG); NATURAL LANGUAGE PROCESSING"
+        },
+        {
+            "title": "A mechanism-guided multimodal industrial copilot with incremental learning for natural products manufacturing",
+            "authors": "Xue, QL; Yu, Y; Yan, YQ; Zhang, JX; Li, Z",
+            "journal": "Applied Soft Computing",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "MECHANISM-GUIDED LARGE LANGUAGE MODEL; MULTIMODAL INDUSTRIAL COPILOT; MODAL ALIGNMENT; NATURAL PRODUCTS MANUFACTURING"
+        },
+        {
+            "title": "Honey, I Shrunk the Language Model: Impact of Knowledge Distillation Methods on Performance and Explainability",
+            "authors": "Hendriks, D; Spitzer, P; K\u00fchl, N; Satzger, G",
+            "journal": "Ieee Transactions On Knowledge And Data Engineering",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "TRAINING; DATA MODELS; TRAINING DATA; COMPUTATIONAL MODELING; COGNITION; DATA COLLECTION; ADAPTATION MODELS; RELIABILITY; QUESTION ANSWERING (INFORMATION RETRIEVAL); LOGIC; EXPLAINABILITY; KNOWLEDGE DISTILLATION; LANGUAGE MODELS; PERFORMANCE"
+        },
+        {
+            "title": "Toward Edge General Intelligence With Agentic AI and Agentification: Concepts, Technologies, and Future Directions",
+            "authors": "Zhang, RC; Liu, GY; Liu, YQ; Zhao, CY; Wang, JC; Xu, YT; Niyato, D; Kang, JW; Li, YH; Mao, SW; Sun, SM; Shen, XM; Kim, DI",
+            "journal": "Ieee Communications Surveys And Tutorials",
+            "year": 2026,
+            "citations": 10,
+            "keywords": "6G NETWORKS; AGENTIC AI; AGENTIFICATION; AGENTIFICATION; EDGE GENERAL INTELLIGENCE; EDGE GENERAL INTELLIGENCE; EDGE INTELLIGENCE; EDGE INTELLIGENCE; AI AGENT; AI AGENT; REINFORCEMENT LEARNING; REINFORCEMENT LEARNING; RETRIEVAL-AUGMENTED GENERATION (RAG); RETRIEVAL-AUGMENTED GENERATION (RAG); LARGE LANGUAGE MODELS (LLMS); LARGE LANGUAGE MODELS (LLMS); LARGE LANGUAGE MODELS (LLMS)"
+        },
+        {
+            "title": "A High-Speed FPGA Implementation for IVF-PQ Index Construction",
+            "authors": "Song, YF; Du, Y; Wang, ZF",
+            "journal": "Ieee Transactions On Circuits And Systems I-Regular Papers",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "VECTORS; HARDWARE; PARTITIONING ALGORITHMS; FIELD PROGRAMMABLE GATE ARRAYS; CLUSTERING ALGORITHMS; INDEXING; QUANTIZATION (SIGNAL); APPROXIMATION ALGORITHMS; SEARCH ENGINES; NEAREST NEIGHBOR METHODS; APPROXIMATE NEAREST NEIGHBOR SEARCH; INDEX CONSTRUCTION; HARDWARE; IVF-PQ; FPGA"
+        },
+        {
+            "title": "Distilling Privileged Knowledge From Transformers to Lightweight CNNs for On-Device Time Series Forecasting",
+            "authors": "Na, SJ; Cho, YH; Baek, Y",
+            "journal": "IEEE ACCESS",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "FORECASTING; TIME SERIES ANALYSIS; COMPUTER ARCHITECTURE; COMPUTATIONAL MODELING; TRANSFORMERS; PREDICTIVE MODELS; ACCURACY; REAL-TIME SYSTEMS; CONVOLUTIONAL NEURAL NETWORKS; KNOWLEDGE ENGINEERING; TIME SERIES FORECASTING; KNOWLEDGE DISTILLATION; HETEROGENEOUS KNOWLEDGE DISTILLATION; LIGHTWEIGHT CONVOLUTIONAL NEURAL NETWORKS; MODEL COMPRESSION; TINYML; EDGE AI"
+        },
+        {
+            "title": "Compressing Neural Networks using Learnable 1D Non-Linear Functions",
+            "authors": "Singh, G; Bazargan, K",
+            "journal": "Acm Transactions On Reconfigurable Technology And Systems",
+            "year": 2025,
+            "citations": 3,
+            "keywords": "NATURAL LANGUAGE PROCESSING; PRE-TRAINED LANGUAGE MODEL; KOREAN LANGUAGE MODEL; KNOWLEDGE DISTILLATION; LOW-RANK FACTORIZATION; RESOURCE-CONSTRAINED ENVIRONMENT"
+        },
+        {
+            "title": "MicroBERT: Distilling MoE-Based Knowledge from BERT into a Lighter Model",
+            "authors": "Zheng, DS; Li, JX; Yang, YC; Wang, YP; Pang, PCI",
+            "journal": "Applied Sciences-Basel",
+            "year": 2024,
+            "citations": 1,
+            "keywords": "FPGA ACCELERATOR; NEURAL NETWORKS; MODEL COMPRESSION; NON-LINEAR FUNCTIONS; PARAMETERIZED ACTIVATION FUNCTION; LOOKUP TABLE"
+        },
+        {
+            "title": "Lightweight Pre-Trained Korean Language Model Based on Knowledge Distillation and Low-Rank Factorization",
+            "authors": "Kim, JH; Choi, YS",
+            "journal": "Entropy",
+            "year": 2025,
+            "citations": 11,
+            "keywords": "NATURAL LANGUAGE PROCESSING; KNOWLEDGE DISTILLATION; GENERATIVE ADVERSARIAL NETWORKS; MIXTURE-OF-EXPERTS"
+        },
+        {
+            "title": "Accelerating Mixture-of-Experts language model inference via plug-and-play lookahead gate on a single GPU",
+            "authors": "Ou, J; Chen, YM; Xiong, BY; Wang, ZK; Tian, WH",
+            "journal": "Computer Standards & Interfaces",
+            "year": 2025,
+            "citations": 1,
+            "keywords": "MIXTURE-OF-EXPERTS; PLUG-AND-PLAY LOOKAHEAD GATE; LAYER-WISE GATE ALIGNMENT; ACCELERATING MODEL INFERENCE"
+        },
+        {
+            "title": "FedQuad: Adaptive Layer-Wise LoRA Deployment and Activation Quantization for Federated Fine-Tuning",
+            "authors": "Liu, JC; Li, RK; Xu, HL; Ma, QP; Yan, JM; Huang, LS",
+            "journal": "IEEE TRANSACTIONS ON MOBILE COMPUTING",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "TRAINING; LORA; COMPUTATIONAL MODELING; QUANTIZATION (SIGNAL); PERFORMANCE EVALUATION; MEMORY MANAGEMENT; TRANSFORMERS; ACCURACY; ADAPTATION MODELS; MOBILE COMPUTING; FEDERATED FINE-TUNING; RESOURCE CONSTRAINT; SYSTEM HETEROGENEITY; LOW-RANK ADAPTATION; ACTIVATION QUANTIZATION"
+        },
+        {
+            "title": "An Efficient FPGA Implementation of Approximate Nearest Neighbor Search",
+            "authors": "Song, YF; Liu, CJ; Zhang, RR; Zhu, DY; Wang, ZF",
+            "journal": "Ieee Transactions On Very Large Scale Integration (Vlsi) Systems",
+            "year": 2025,
+            "citations": 2,
+            "keywords": "VECTORS; INDEXES; FIELD PROGRAMMABLE GATE ARRAYS; DATABASES; HARDWARE; ARTIFICIAL INTELLIGENCE; CODES; QUANTIZATION (SIGNAL); CLUSTERING ALGORITHMS; APPROXIMATION ALGORITHMS; APPROXIMATE NEAREST NEIGHBOR SEARCH (ANNS); FIELD-PROGRAMMABLE GATE ARRAY (FPGA); HARDWARE; INVERTED FILE WITH PRODUCT QUANTIZATION (IVF-PQ)"
+        },
+        {
+            "title": "SpinOut: Enhanced Rotation-Based Quantization for LLM by Outlier Injection",
+            "authors": "Park, S; Chung, KS",
+            "journal": "IEEE ACCESS",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "DEEP LEARNING; MODEL COMPRESSION; MODEL COMPRESSION; LLM; LLM; QUANTIZATION; QUANTIZATION; ROTATION-BASED QUANTIZATION; ROTATION-BASED QUANTIZATION; ROTATION-BASED QUANTIZATION"
+        },
+        {
+            "title": "Efficient Kernel Mapping and Comprehensive System Evaluation of LLM Acceleration on a CGLA",
+            "authors": "Ando, T; Eto, Y; Takeuchi, A; Nakashima, Y",
+            "journal": "IEEE ACCESS",
+            "year": 2025,
+            "citations": 0,
+            "keywords": "FIELD PROGRAMMABLE GATE ARRAYS; COMPUTER ARCHITECTURE; KERNEL; QUANTIZATION (SIGNAL); INFERENCE ALGORITHMS; ENERGY EFFICIENCY; GRAPHICS PROCESSING UNITS; DATA TRANSFER; MAIN-SECONDARY; HARDWARE ACCELERATION; QWEN; LLM; CGRA; CGLA; IMAX"
+        },
+        {
+            "title": "A novel energy-efficient spike transformer network for depth estimation from event cameras via cross-modality knowledge distillation",
+            "authors": "Zhang, X; Han, LX; Davies, S; Sobeih, T; Han, LH; Dancey, D",
+            "journal": "Neurocomputing",
+            "year": 2025,
+            "citations": 2,
+            "keywords": "SPIKING NEURAL NETWORKS (SNNS); EVENT CAMERA; TRANSFORMER; DEPTH ESTIMATION; KNOWLEDGE DISTILLATION; NEUROMORPHIC COMPUTING; ENERGY-EFFICIENT COMPUTING"
+        },
+        {
+            "title": "LAMeTA: Intent-Aware Agentic Network Optimization via a Large AI Model-Empowered Two-Stage Approach",
+            "authors": "Liu, YQ; Liu, GY; Wang, JC; Zhang, RC; Niyato, D; Sun, G; Xiong, ZH; Han, Z",
+            "journal": "Ieee Journal On Selected Areas In Communications",
+            "year": 2026,
+            "citations": 4,
+            "keywords": "OPTIMIZATION; QUALITY OF EXPERIENCE; TRANSLATION; SYMBIOSIS; 6G MOBILE COMMUNICATION; ELECTRONIC MAIL; COGNITION; NUMERICAL MODELS; FOUNDATION MODELS; DECISION MAKING; AGENTIC NETWORK; LARGE AI MODEL; INTENT; NETWORK OPTIMIZATION"
+        },
+        {
+            "title": "ChatOCT: Embedded Clinical Decision Support Systems for Optical Coherence Tomography in Offline and Resource-Limited Settings",
+            "authors": "Liu, C; Zhang, HR; Zheng, Z; Liu, WJ; Gu, CF; Lan, Q; Zhang, WY; Yang, JL",
+            "journal": "Journal Of Medical Systems",
+            "year": 2025,
+            "citations": 2,
+            "keywords": "OPTICAL COHERENCE TOMOGRAPHY; LARGE LANGUAGE MODELS; CLINICAL DECISION SUPPORT SYSTEMS; EDGE COMPUTING"
+        },
+        {
+            "title": "Efficient and accurate medical AI: MediLore and MediOut",
+            "authors": "Rayhan, SM; Hariprasath, M; Hemalatha, K",
+            "journal": "Frontiers In Artificial Intelligence",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "LORA ADAPTER FUSION; MEDICAL QUESTION ANSWERING; MODEL COMPRESSION; OUTPUT ENSEMBLING; SEMANTIC SIMILARITY"
+        },
+        {
+            "title": "Hallucination-aware learning and latency optimization transformer (HALL-OPT) for real-time edge intelligence",
+            "authors": "Algawiaz, D",
+            "journal": "Scientific Reports",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "HALLUCINATION DETECTION; TRANSFORMER OPTIMISATION; EDGE COMPUTING; LATENCY REDUCTION; ATTENTION MECHANISM; KNOWLEDGE DISTILLATION; REAL-TIME INFERENCE"
+        },
+        {
+            "title": "SwapNet: Efficient Swapping for DNN Inference on Edge AI Devices Beyond the Memory Budget",
+            "authors": "Wang, K; Cao, JN; Zhou, ZM; Li, ZJ",
+            "journal": "IEEE TRANSACTIONS ON MOBILE COMPUTING",
+            "year": 2024,
+            "citations": 17,
+            "keywords": "GRAPHICS PROCESSING UNITS; TASK ANALYSIS; MEMORY MANAGEMENT; ARTIFICIAL NEURAL NETWORKS; DEEP LEARNING; MOBILE HANDSETS; COMPUTATIONAL MODELING; EDGE AI DEVICE; MEMORY OPTIMIZATION; MEMORY -EFFICIENT DNN INFERENCE; SWAPPING MECHANISM"
+        },
+        {
+            "title": "CurricuForge: A Unified Framework for Progressive Code Generation Through Curriculum-Guided Multi-Agent Collaboration With Symbolic Verification",
+            "authors": "Wang, ZJ",
+            "journal": "IEEE ACCESS",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "CODES; TRAINING; SOFTWARE DEVELOPMENT MANAGEMENT; OPTIMIZATION; REINFORCEMENT LEARNING; COMPLEXITY THEORY; TRANSLATION; SOFTWARE; COLLABORATION; MULTI-AGENT SYSTEMS; AI FOR CODE; CURRICULUM REINFORCEMENT LEARNING; TEST-DRIVEN GENERATION; SYMBOLIC EXECUTION; KNOWLEDGE DISTILLATION; KERNEL FUSION; MULTI-AGENT SYSTEMS; API SCHEMA TRANSLATION; TOOL-AUGMENTED LANGUAGE MODELS"
+        },
+        {
+            "title": "CD-LLM: A Heterogeneous Multi-FPGA System for Batched Decoding of 70B+LLMs Using a Compute-Dedicated Architecture",
+            "authors": "Ma, WH; Yang, XH; Zeng, SL; Liu, TX; Shen, LB; Wang, HY; Li, SY; Hong, K; Zhu, ZH; Ning, XF; Ho, TY; Dai, GH; Wang, Y",
+            "journal": "Acm Transactions On Reconfigurable Technology And Systems",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "LLM ACCELERATOR; FPGA; COMPUTE-DEDICATED ARCHITECTURE; STREAMING ARCHITECTURE"
+        },
+        {
+            "title": "Subkv: Quantizing Long Context KV Cache for Sub-Billion Parameter Language Models on Edge Devices",
+            "authors": "Zeng, ZQ; Zhang, T; Lu, ZD; Li, WJ; Zhuang, HP; Shao, HG; Teo, SG; Zou, XF",
+            "journal": "Software-Practice & Experience",
+            "year": 2025,
+            "citations": 2,
+            "keywords": "DYNAMIC WINDOW QUANTIZATION; EDGE DEVICES; KV CACHE QUANTIZATION; PER-CHANNEL KEY QUANTIZATION; PER-TOKEN VALUE QUANTIZATION; SINK-AWARE QUANTIZATION"
+        },
+        {
+            "title": "Joint multilingual adaptive attention fusion based multi-teacher KD with contrastive learning for Indic LoRes cross-domain, multi-intent NLU",
+            "authors": "Mitra, K; Malapati, A; Lee, M",
+            "journal": "Knowledge-Based Systems",
+            "year": 2026,
+            "citations": 0,
+            "keywords": "ATTENTION FUSION; CONTRASTIVE LEARNING; ADAPTIVE TEMPERATURE SCALING; MULTIPLE TEACHER KD; INDIC LOW RESOURCE"
+        },
+        {
+            "title": "Optimizing Fine-Tuning in Quantized Language Models: An In-Depth Analysis of Key Variables",
+            "authors": "Shen, A; Lai, ZQ; Li, DS; Hu, XY",
+            "journal": "Cmc-Computers Materials & Continua",
+            "year": 2025,
+            "citations": 2,
+            "keywords": "LARGE-SCALE LANGUAGE MODEL; PARAMETER-EFFICIENT FINE-TUNING; PARAMETER QUANTIZATION; KEY VARIABLE; TRAINABLE; PARAMETERS; EXPERIMENTAL ANALYSIS"
+        }
+    ]
+};
+        
+        // Populate KPIs
+        document.getElementById('kpi-total-articles').innerText = rslData.kpis.totalArticles;
+        document.getElementById('kpi-years-range').innerText = rslData.kpis.yearsRange;
+        document.getElementById('kpi-total-citations').innerText = rslData.kpis.totalCitations;
+        document.getElementById('kpi-avg-citations').innerText = rslData.kpis.avgCitations;
+        document.getElementById('kpi-collab-rate').innerText = rslData.kpis.collaborationRate;
+        document.getElementById('kpi-top-country').innerText = rslData.kpis.topCountry;
+        
+        // --- CHART 1: TEMPORAL ---
+        const years = rslData.temporal.map(d => d.PY);
+        const articles = rslData.temporal.map(d => d.Articulos);
+        const avgCitations = rslData.temporal.map(d => Math.round(d.Promedio_Citas * 100) / 100);
+        
+        const trace1 = {
+            x: years,
+            y: articles,
+            name: 'Artículos Publicados',
+            type: 'bar',
+            marker: {
+                color: '#1e293b',
+                opacity: 0.85
+            },
+            offsetgroup: 1
+        };
+        
+        const trace2 = {
+            x: years,
+            y: avgCitations,
+            name: 'Promedio de Citas',
+            type: 'scatter',
+            yaxis: 'y2',
+            mode: 'lines+markers',
+            line: { color: '#f43f5e', width: 3 },
+            marker: { size: 8, color: '#f43f5e' },
+            offsetgroup: 2
+        };
+        
+        const layout1 = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#f1f5f9', family: 'Inter, sans-serif' },
+            xaxis: {
+                gridcolor: '#222e45',
+                tickmode: 'linear',
+                tickformat: 'd'
+            },
+            yaxis: {
+                title: 'Cantidad de Artículos',
+                gridcolor: '#222e45',
+                side: 'left'
+            },
+            yaxis2: {
+                title: 'Promedio de Citas (Impacto)',
+                gridcolor: 'rgba(0,0,0,0)',
+                overlaying: 'y',
+                side: 'right'
+            },
+            legend: { orientation: 'h', y: -0.2, x: 0.5, xanchor: 'center' },
+            margin: { t: 20, b: 60, l: 50, r: 50 },
+            hovermode: 'closest'
+        };
+        
+        Plotly.newPlot('chart-temporal', [trace1, trace2], layout1, {responsive: true, displayModeBar: false});
+        
+        // --- CHART 2: BRADFORD'S LAW ---
+        const bradData = rslData.bradford;
+        const bradRanks = bradData.map(d => d.Rank);
+        const bradCum = bradData.map(d => d.Cum_Count);
+        const bradJournals = bradData.map(d => d.Journal);
+        
+        const traceBrad = {
+            x: bradRanks,
+            y: bradCum,
+            text: bradJournals.map((j, i) => `Rango ${i+1}: ${j}`),
+            hoverinfo: 'text+y',
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: { color: '#3b82f6', width: 2.5 },
+            marker: { size: 6, color: '#1e293b' }
+        };
+        
+        const layoutBrad = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#f1f5f9', family: 'Inter, sans-serif' },
+            xaxis: {
+                title: 'Rango de Revista (Escala Log)',
+                type: 'log',
+                gridcolor: '#222e45'
+            },
+            yaxis: {
+                title: 'Artículos Acumulados',
+                gridcolor: '#222e45'
+            },
+            margin: { t: 20, b: 50, l: 50, r: 20 },
+            shapes: [
+                {
+                    type: 'line',
+                    x0: rslData.bradford_zone1_end,
+                    y0: 0,
+                    x1: rslData.bradford_zone1_end,
+                    y1: rslData.kpis.totalArticles,
+                    line: { color: '#f43f5e', width: 1.5, dash: 'dash' }
+                },
+                {
+                    type: 'line',
+                    x0: rslData.bradford_zone2_end,
+                    y0: 0,
+                    x1: rslData.bradford_zone2_end,
+                    y1: rslData.kpis.totalArticles,
+                    line: { color: '#3b82f6', width: 1.5, dash: 'dash' }
+                }
+            ]
+        };
+        
+        Plotly.newPlot('chart-bradford', [traceBrad], layoutBrad, {responsive: true, displayModeBar: false});
+        
+        // --- CHART 3: COUNTRIES STACKED BAR ---
+        const topCountries = rslData.countries.slice(0, 10).reverse();
+        const countryNames = topCountries.map(d => d.Country);
+        const scps = topCountries.map(d => d.SCP);
+        const mcps = topCountries.map(d => d.MCP);
+        
+        const traceSCP = {
+            y: countryNames,
+            x: scps,
+            name: 'SCP (Coautoría Nacional)',
+            type: 'bar',
+            orientation: 'h',
+            marker: {
+                color: '#0f766e',
+                opacity: 0.85
+            }
+        };
+        
+        const traceMCP = {
+            y: countryNames,
+            x: mcps,
+            name: 'MCP (Coautoría Internacional)',
+            type: 'bar',
+            orientation: 'h',
+            marker: {
+                color: '#f97316',
+                opacity: 0.85
+            }
+        };
+        
+        const layoutCountry = {
+            barmode: 'stack',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#f1f5f9', family: 'Inter, sans-serif' },
+            xaxis: {
+                title: 'Cantidad de Artículos',
+                gridcolor: '#222e45'
+            },
+            yaxis: {
+                gridcolor: '#222e45',
+                tickmode: 'linear'
+            },
+            legend: { orientation: 'h', y: -0.2, x: 0.5, xanchor: 'center' },
+            margin: { t: 20, b: 50, l: 120, r: 20 }
+        };
+        
+        Plotly.newPlot('chart-countries', [traceSCP, traceMCP], layoutCountry, {responsive: true, displayModeBar: false});
+        
+        // --- CHART 4: TREEMAP ---
+        const kwLabels = rslData.keywords.map(d => d.Keyword);
+        const kwValues = rslData.keywords.map(d => d.Frecuencia);
+        
+        const traceTreemap = {
+            type: "treemap",
+            labels: kwLabels,
+            parents: kwLabels.map(() => ""),
+            values: kwValues,
+            textinfo: "label+value",
+            textposition: "middle center",
+            hoverinfo: "label+value",
+            marker: {
+                colorscale: 'Mako',
+                reversescale: true
+            }
+        };
+        
+        const layoutTreemap = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#f1f5f9', family: 'Inter, sans-serif' },
+            margin: { t: 10, b: 10, l: 10, r: 10 }
+        };
+        
+        Plotly.newPlot('chart-treemap', [traceTreemap], layoutTreemap, {responsive: true, displayModeBar: false});
+        
+        // --- CHART 5: THEMATIC MAP ---
+        const themeData = rslData.thematic;
+        const themeC = themeData.map(d => d.Centrality);
+        const themeD = themeData.map(d => d.Density);
+        const themeLabels = themeData.map(d => d.Keyword);
+        const themeFreqs = themeData.map(d => d.Frequency);
+        
+        const traceTheme = {
+            x: themeC,
+            y: themeD,
+            text: themeLabels,
+            mode: 'markers+text',
+            textposition: 'top center',
+            hoverinfo: 'text',
+            hovertext: themeLabels.map((l, i) => `<b>${l}</b><br>Frecuencia: ${themeFreqs[i]}<br>Centralidad: ${themeC[i]}<br>Densidad: ${themeD[i].toFixed(2)}`),
+            marker: {
+                size: themeFreqs.map(f => Math.max(12, f * 2.5)),
+                color: '#f43f5e',
+                opacity: 0.8,
+                line: { color: '#ffffff', width: 1 }
+            },
+            type: 'scatter'
+        };
+        
+        const layoutTheme = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#f1f5f9', family: 'Inter, sans-serif' },
+            xaxis: {
+                title: 'Centralidad (Relevancia / Conexión Externa)',
+                gridcolor: '#222e45',
+                zeroline: false
+            },
+            yaxis: {
+                title: 'Densidad (Desarrollo / Cohesión Interna)',
+                gridcolor: '#222e45',
+                zeroline: false
+            },
+            margin: { t: 20, b: 50, l: 50, r: 20 },
+            shapes: [
+                {
+                    type: 'line',
+                    x0: rslData.thematic_median_c,
+                    y0: Math.min(...themeD) - 0.2,
+                    x1: rslData.thematic_median_c,
+                    y1: Math.max(...themeD) + 0.2,
+                    line: { color: '#94a3b8', width: 1.5, dash: 'dash' }
+                },
+                {
+                    type: 'line',
+                    x0: Math.min(...themeC) - 0.2,
+                    y0: rslData.thematic_median_d,
+                    x1: Math.max(...themeC) + 0.2,
+                    y1: rslData.thematic_median_d,
+                    line: { color: '#94a3b8', width: 1.5, dash: 'dash' }
+                }
+            ]
+        };
+        
+        Plotly.newPlot('chart-thematic', [traceTheme], layoutTheme, {responsive: true, displayModeBar: false});
+        
+        // --- CHART 6: SANKEY (THREE FIELDS PLOT) ---
+        const sankeyData = rslData.sankey;
+        const nodeColors = [];
+        
+        sankeyData.nodes.forEach((node, idx) => {
+            if (idx < sankeyData.country_count) {
+                nodeColors.push('#14b8a6');
+            } else if (idx < sankeyData.country_count + sankeyData.keyword_count) {
+                nodeColors.push('#8b5cf6');
+            } else {
+                nodeColors.push('#ec4899');
+            }
+        });
+        
+        const traceSankey = {
+            type: "sankey",
+            orientation: "h",
+            node: {
+                pad: 15,
+                thickness: 20,
+                line: { color: "rgba(0,0,0,0.3)", width: 0.5 },
+                label: sankeyData.nodes.map(n => n.name),
+                color: nodeColors
+            },
+            link: {
+                source: sankeyData.links.map(l => l.source),
+                target: sankeyData.links.map(l => l.target),
+                value: sankeyData.links.map(l => l.value),
+                color: 'rgba(255, 255, 255, 0.12)'
+            }
+        };
+        
+        const layoutSankey = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#f1f5f9', family: 'Inter, sans-serif' },
+            margin: { t: 20, b: 20, l: 10, r: 10 }
+        };
+        
+        Plotly.newPlot('chart-sankey', [traceSankey], layoutSankey, {responsive: true, displayModeBar: false});
+
+        // --- POPULATE TABLE ---
+        const tableBody = document.getElementById('articles-table-body');
+        
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No se encontraron artículos</td></tr>';
+                return;
+            }
+            
+            data.forEach((art, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="color: var(--text-muted); font-weight: 500;">${index + 1}</td>
+                    <td>
+                        <div class="article-title">${escapeHtml(art.title)}</div>
+                    </td>
+                    <td>
+                        <div class="article-authors" title="${escapeHtml(art.authors)}">${escapeHtml(art.authors)}</div>
+                    </td>
+                    <td style="color: var(--text-muted); font-size: 0.85rem;">${escapeHtml(art.journal)}</td>
+                    <td style="text-align: center;"><span class="badge badge-year">${art.year}</span></td>
+                    <td style="text-align: center;"><span class="badge badge-citations">${art.citations}</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        renderTable(rslData.articles);
+        
+        // --- TABLE SEARCH FILTER ---
+        const searchInput = document.getElementById('table-search');
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const filtered = rslData.articles.filter(art => {
+                return art.title.toLowerCase().includes(query) || 
+                       art.authors.toLowerCase().includes(query) || 
+                       art.journal.toLowerCase().includes(query) ||
+                       art.keywords.toLowerCase().includes(query);
+            });
+            renderTable(filtered);
+        });
+    </script>
+</body>
+</html>
