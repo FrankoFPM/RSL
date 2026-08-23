@@ -55,12 +55,22 @@ def clean_journal(journal_str):
         'IEEE ACCESS': 'IEEE ACCESS',
         'IEEE TRANSACTIONS ON NETWORK SCIENCE AND ENGINEERING': 'IEEE TRANSACTIONS ON NETWORK SCIENCE AND ENGINEERING',
         'IEEE TRANS. NETW. SCI. ENG.': 'IEEE TRANSACTIONS ON NETWORK SCIENCE AND ENGINEERING',
+        'IEEE TRANS CONSUM ELECTRON': 'IEEE TRANSACTIONS ON CONSUMER ELECTRONICS',
+        'IEEE TRANSACTIONS ON CONSUMER ELECTRONICS': 'IEEE TRANSACTIONS ON CONSUMER ELECTRONICS',
+        'IEEE TRANS CIRCUITS SYST VIDEO TECHNOL': 'IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS FOR VIDEO TECHNOLOGY',
+        'IEEE T PARALL DISTR': 'IEEE TRANSACTIONS ON PARALLEL AND DISTRIBUTED SYSTEMS',
+        'AUTON. INTELL. SYST.': 'AUTONOMOUS INTELLIGENT SYSTEMS',
+        'NAT. COMMUN.': 'NATURE COMMUNICATIONS',
+        'CMC-COMPUTERS MATERIALS & CONTINUA': 'CMC-COMPUTERS MATERIALS AND CONTINUA',
     }
-    
+
+    # Coincidencia exacta primero
     if j in mapping:
         return mapping[j]
-    for key, val in mapping.items():
-        if key in j:
+    # Coincidencia por prefijo (evita falsos positivos de 'key in j' sobre
+    # subcadenas cortas como 'IEEE ACCESS' dentro de otro titulo)
+    for key, val in sorted(mapping.items(), key=lambda kv: -len(kv[0])):
+        if j.startswith(key) or key.startswith(j):
             return val
     return j.title()
 
@@ -136,8 +146,13 @@ def run_analysis(no_title=False, output_dir='.'):
     if output_dir != '.':
         os.makedirs(output_dir, exist_ok=True)
     excel_file = 'ARTICULOS_UNIFICADOS_CRIBADO.xlsx'
-    print(f"Reading {excel_file}...")
-    df = pd.read_excel(excel_file)
+    # La hoja 'SELECCIONADOS-FINAL' contiene el corpus definitivo (n=80).
+    # NO usar la hoja por defecto ('SELECCIONADOS', n=149): esa es la etapa de
+    # cribado previa a la aplicacion de los criterios de elegibilidad.
+    sheet = 'SELECCIONADOS-FINAL'
+    print(f"Reading {excel_file} [hoja: {sheet}]...")
+    df = pd.read_excel(excel_file, sheet_name=sheet)
+    print(f"  Corpus cargado: {len(df)} estudios primarios")
     
     # Fill missing values
     df['PY'] = df['PY'].fillna(0).astype(int)
