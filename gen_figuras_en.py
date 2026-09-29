@@ -1,0 +1,300 @@
+# -*- coding: utf-8 -*-
+"""English, single-column versions of the four manuscript figures (FGCS, twocolumn).
+
+Each figure is drawn at its final printed width (one column, ~3.5 in) so the
+font sizes set here are the sizes that appear in the PDF: nothing is scaled
+down by LaTeX. Include with  \\includegraphics[width=\\columnwidth]{...}
+
+Outputs (figuras_en/):
+    image8.png              PRISMA flow diagram
+    image6.png              Strategic thematic map
+    grafico_frecuencia.pdf  Adoption frequency of optimisation techniques
+    grafico_rq4_matriz.pdf  RQ4: technique x hardware platform matrix
+(PNG/PDF twins of each are also written for previewing.)
+"""
+import os
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+import networkx as nx
+import pandas as pd
+
+from process_rsl import clean_keyword   # same keyword normalisation as the corpus analysis
+
+OUT = 'figuras_en'
+os.makedirs(OUT, exist_ok=True)
+
+COL_W = 3.5                     # inches: one column of elsarticle 3p twocolumn
+NAVY, ROSE, SLATE, INK, GRID = '#343b4a', '#f43f5e', '#94a3b8', '#1e293b', '#cbd5e1'
+
+plt.rcParams.update({
+    'font.family': 'sans-serif',
+    'font.sans-serif': ['DejaVu Sans', 'Arial', 'Helvetica'],
+    'font.size': 8.5,
+    'axes.labelsize': 9,
+    'axes.labelweight': 'bold',
+    'axes.labelcolor': INK,
+    'xtick.labelsize': 8,
+    'ytick.labelsize': 8,
+    'xtick.color': '#475569',
+    'ytick.color': '#475569',
+    'text.color': INK,
+    'pdf.fonttype': 42,          # TrueType, not Type 3 (Elsevier-friendly)
+    'ps.fonttype': 42,
+    'savefig.dpi': 600,
+    'savefig.bbox': 'tight',
+    'savefig.pad_inches': 0.03,
+    'savefig.facecolor': 'white',
+})
+
+
+def save(fig, stem, main_ext):
+    for ext in ('pdf', 'png'):
+        fig.savefig(os.path.join(OUT, f'{stem}.{ext}'))
+    plt.close(fig)
+    print(f'[ok] {stem}.{main_ext}')
+
+
+# =================================================================== 1. FREQUENCY
+tec = [('Quantization', 47),
+       ('Pruning and\nsparsity induction', 25),
+       ('Low-rank adaptation\n(LoRA / PEFT)', 18),
+       ('Knowledge\ndistillation', 17)][::-1]
+fig, ax = plt.subplots(figsize=(COL_W, 2.35))
+y = list(range(len(tec)))
+bars = ax.barh(y, [v for _, v in tec], height=0.62, color=NAVY, zorder=3)
+bars[-1].set_color(ROSE)
+for i, (_, v) in enumerate(tec):
+    ax.text(v + 0.8, i, f'{v} ({v/80*100:.0f}%)', va='center', ha='left',
+            fontsize=8.5, weight='bold', color=INK)
+ax.set_yticks(y)
+ax.set_yticklabels([k for k, _ in tec], fontsize=8.5, color=INK)
+ax.set_xlabel('Number of studies (n = 80)', labelpad=5)
+ax.set_xlim(0, 60)
+ax.set_xticks(range(0, 51, 10))
+ax.tick_params(axis='x', colors=SLATE)
+ax.tick_params(axis='y', length=0)
+ax.grid(axis='x', linestyle='--', alpha=.3, color=SLATE, zorder=0)
+for s in ('top', 'right', 'left'):
+    ax.spines[s].set_visible(False)
+ax.spines['bottom'].set_color(SLATE); ax.spines['bottom'].set_linewidth(.8)
+fig.tight_layout()
+save(fig, 'grafico_frecuencia', 'pdf')
+
+
+# =================================================================== 2. PRISMA
+# Coordinates are in points (1/72 in) so box sizes follow the text they hold.
+W = COL_W * 72
+FS, FS_SIDE, LS = 7.5, 6.6, 1.25
+GAP, PAD = 13, 9
+PH_X, PH_W = 0, 13                 # phase band
+MX, MW = 19, 125                   # main column
+SX = MX + MW + 12                  # side column
+SW = W - SX
+
+
+def h_of(text, fs):
+    return len(text.split('\n')) * fs * LS * 1.18 + 2 * PAD
+
+
+rows = [  # (phase, main text, side text, main style)
+    ('IDENTIFICATION',
+     'Records identified\nfrom databases (n = 724)\n\nScopus: n = 586\nWeb of Science: n = 138',
+     'No date restriction\nin the initial search\n(literature since 2003)', 'normal'),
+    ('SCREENING',
+     'Records after\nde-duplication and\npreliminary screening\n(n = 149)',
+     'Records excluded (n = 575)\n\nDuplicates: n = 171\n(127 cross-database,\n44 internal)\n'
+     'Non-primary type\n(EC-4): n = 385\nLanguage (IC-4): n = 5\nSecondary literature or\nincomplete metadata:\nn = 14',
+     'normal'),
+    ('SCREENING',
+     'Records screened by\ntitle and abstract\n(n = 149)',
+     'Records excluded (n = 69)\n\nOff-topic, general AI,\nor simulation without\na real physical\nconstraint\n(fails IC-2 / meets EC-1)',
+     'normal'),
+    ('INCLUDED',
+     'Studies included\nin the review (n = 80)\n\n2024: n = 9\n2025: n = 31\n2026: n = 40',
+     None, 'highlight'),
+]
+note = ('18 of the 80 included studies (22%) report a\nconcrete edge hardware platform. The remaining 62\n'
+        'use generic descriptors or validate on GPUs outside\nthe edge scope. 36 studies (45%) were coded from\n'
+        'the abstract and indexed metadata.')
+
+layout, y = [], 0
+for ph, mt, st, style in rows:
+    hm, hs = h_of(mt, FS), (h_of(st, FS_SIDE) if st else 0)
+    rh = max(hm, hs, 70 if ph == 'IDENTIFICATION' else 0)
+    layout.append((ph, mt, st, style, y, rh, hm, hs))
+    y += rh + GAP
+hn = h_of(note, FS_SIDE)
+H = y + hn + 2
+
+fig = plt.figure(figsize=(COL_W, H / 72))
+ax = fig.add_axes([0, 0, 1, 1])
+ax.set_xlim(0, W); ax.set_ylim(H, 0); ax.axis('off')
+
+
+def box(x, ytop, w, h, text, style='normal', fs=FS):
+    fc = {'highlight': '#fdf2f4', 'side': '#f8fafc'}.get(style, '#ffffff')
+    ax.add_patch(FancyBboxPatch((x, ytop), w, h, boxstyle='round,pad=0,rounding_size=3',
+                 linewidth=1.1 if style == 'highlight' else 0.7,
+                 edgecolor=ROSE if style == 'highlight' else SLATE, facecolor=fc, zorder=2))
+    ax.text(x + w/2, ytop + h/2, text, ha='center', va='center', zorder=3, fontsize=fs,
+            color=INK, weight='bold' if style == 'highlight' else 'normal', linespacing=LS)
+
+
+def arrow(x1, y1, x2, y2):
+    ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle='-|>', mutation_scale=7,
+                 linewidth=0.8, color=SLATE, zorder=1, shrinkA=0, shrinkB=0))
+
+
+prev_bottom, phases = None, {}
+for ph, mt, st, style, ytop, rh, hm, hs in layout:
+    ym = ytop + (rh - hm) / 2
+    box(MX, ym, MW, hm, mt, style)
+    if st:
+        box(SX, ytop + (rh - hs) / 2, SW, hs, st, 'side', FS_SIDE)
+        if ph != 'IDENTIFICATION':
+            arrow(MX + MW, ytop + rh/2, SX, ytop + rh/2)
+    if prev_bottom is not None:
+        arrow(MX + MW/2, prev_bottom, MX + MW/2, ym)
+    prev_bottom = ym + hm
+    p0, p1 = phases.get(ph, (ytop, ytop + rh))
+    phases[ph] = (min(p0, ytop), max(p1, ytop + rh))
+box(MX, y, W - MX - 0.5, hn, note, 'side', FS_SIDE)
+
+for ph, (p0, p1) in phases.items():
+    ax.add_patch(FancyBboxPatch((PH_X, p0), PH_W, p1 - p0, boxstyle='round,pad=0,rounding_size=3',
+                 linewidth=0, facecolor='#fde7eb', zorder=1))
+    ax.text(PH_X + PH_W/2, (p0 + p1)/2, ph, rotation=90, ha='center', va='center',
+            fontsize=6.8, weight='bold', color=ROSE)
+
+save(fig, 'image8', 'png')
+
+
+# =================================================================== 3. THEMATIC MAP
+df = pd.read_excel('ARTICULOS_UNIFICADOS_CRIBADO.xlsx', sheet_name='SELECCIONADOS-FINAL')
+df['DE'] = df['DE'].fillna('')
+kws_all = []
+for s in df['DE']:
+    if s:
+        kws_all.extend([k for k in (clean_keyword(x) for x in str(s).split(';')) if k])
+kw_counts = pd.Series(kws_all).value_counts().reset_index()
+kw_counts.columns = ['Keyword', 'Frecuencia']
+
+G = nx.Graph()
+for _, r in kw_counts.head(25).iterrows():
+    G.add_node(r['Keyword'], size=r['Frecuencia'])
+for s in df['DE']:
+    if not s:
+        continue
+    kws = [k for k in set(clean_keyword(x) for x in str(s).split(';') if x.strip()) if k in G.nodes]
+    for i in range(len(kws)):
+        for j in range(i + 1, len(kws)):
+            if G.has_edge(kws[i], kws[j]):
+                G[kws[i]][kws[j]]['weight'] += 1
+            else:
+                G.add_edge(kws[i], kws[j], weight=1)
+G.remove_nodes_from(list(nx.isolates(G)))
+
+rows = []
+for n in G.nodes:
+    c = sum(G[n][m]['weight'] for m in G.neighbors(n))
+    nb = list(G.neighbors(n))
+    if len(nb) < 2:
+        d = 0.0
+    else:
+        e = G.subgraph(nb).edges(data=True)
+        d = sum(x.get('weight', 1.0) for *_, x in e) / len(e) if len(e) else 0.0
+    rows.append({'Keyword': n, 'Centrality': float(c), 'Density': float(d), 'Frequency': int(G.nodes[n]['size'])})
+th = pd.DataFrame(rows)
+th.to_csv(os.path.join(OUT, 'mapa_tematico_datos.csv'), index=False)
+
+fig, ax = plt.subplots(figsize=(COL_W, 3.2))
+ax.scatter(th['Centrality'], th['Density'], s=th['Frequency'] * 4.5, color=ROSE, alpha=0.75,
+           edgecolors='white', linewidths=0.6, zorder=3)
+med_c, med_d = float(th['Centrality'].median()), float(th['Density'].median())
+ax.axvline(med_c, color=SLATE, ls='--', lw=0.9, alpha=0.8, zorder=1)
+ax.axhline(med_d, color=SLATE, ls='--', lw=0.9, alpha=0.8, zorder=1)
+ax.margins(x=0.2, y=0.2)
+xl, yl = ax.get_xlim(), ax.get_ylim()
+qfs = 6.8
+quad = [
+    ax.text(xl[1] - (xl[1]-med_c)*.03, yl[1] - (yl[1]-med_d)*.04, 'MOTOR\nTHEMES', ha='right', va='top', fontsize=qfs, weight='bold', color='#16a34a'),
+    ax.text(xl[0] + (med_c-xl[0])*.05, yl[1] - (yl[1]-med_d)*.04, 'NICHE\nTHEMES', ha='left', va='top', fontsize=qfs, weight='bold', color='#4f46e5'),
+    ax.text(xl[0] + (med_c-xl[0])*.05, yl[0] + (med_d-yl[0])*.04, 'EMERGING OR\nDECLINING', ha='left', va='bottom', fontsize=qfs, weight='bold', color='#dc2626'),
+    ax.text(xl[1] - (xl[1]-med_c)*.03, yl[0] + (med_d-yl[0])*.04, 'BASIC AND\nTRANSVERSAL', ha='right', va='bottom', fontsize=qfs, weight='bold', color='#ca8a04'),
+]
+# Label positions fixed by hand (adjustText crossed leaders over the dense cluster).
+# (dx, dy) in data units from the bubble centre, plus alignment.
+LAB = {
+    'Large language models':  (4, 0.22, 'center', 'bottom'),
+    'Computational modeling': (-11, -0.09, 'right', 'center'),
+    'Quantization':           (-6, 0.0, 'right', 'center'),
+    'Adaptation models':      (0, 0.09, 'center', 'bottom'),
+    'Training':               (4, 0.0, 'left', 'center'),
+    'Hardware':               (0, -0.11, 'center', 'top'),
+    'Deep learning':          (-3.5, 0.0, 'right', 'center'),
+    'Edge computing':         (-3.5, 0.0, 'right', 'center'),
+    'Knowledge distillation': (22, 0.0, 'left', 'center'),
+    'Model compression':      (4, 0.03, 'left', 'center'),
+}
+top = th.nlargest(10, 'Frequency')
+SHOW = {'Large language models': 'Large language\nmodels', 'Adaptation models': 'Adaptation\nmodels',
+        'Edge computing': 'Edge\ncomputing', 'Deep learning': 'Deep\nlearning'}
+for _, r in top.iterrows():
+    dx, dy, ha, va = LAB.get(r['Keyword'], (3, 0, 'left', 'center'))
+    far = abs(dx) > 6 or abs(dy) > 0.12
+    ax.annotate(SHOW.get(r['Keyword'], r['Keyword']), (r['Centrality'], r['Density']),
+                xytext=(r['Centrality'] + dx, r['Density'] + dy), ha=ha, va=va,
+                fontsize=7, weight='bold', color=NAVY, zorder=5, linespacing=1.0,
+                arrowprops=dict(arrowstyle='-', color=SLATE, lw=0.5, shrinkA=1, shrinkB=3) if far else None)
+ax.set_xlim(xl); ax.set_ylim(yl)
+ax.set_xlabel('Centrality (external relevance)', labelpad=4)
+ax.set_ylabel('Density (internal cohesion)', labelpad=4)
+ax.grid(True, ls='--', alpha=0.25, color=GRID)
+for s in ax.spines.values():
+    s.set_visible(False)
+ax.tick_params(length=0)
+fig.tight_layout()
+save(fig, 'image6', 'png')
+
+
+# =================================================================== 4. RQ4 MATRIX
+# Counts of studies per optimisation family x declared hardware platform (Annex A).
+# Identical to the Spanish figure; transposed (platforms as rows) to fit one column.
+techs = ['Quantization', 'Pruning/\nsparsity', 'LoRA/\nPEFT', 'Distillation']
+plats = ['FPGA', 'Jetson', 'SBC (RPi)', 'Mobile SoC', 'NPU / ASIC', 'ARM / RISC-V', 'Unspecified']
+M = {  # tech -> platform counts
+    'Quantization':            [5, 2, 2, 1, 1, 1, 32],
+    'Pruning/\nsparsity':      [2, 2, 1, 1, 0, 0, 14],
+    'LoRA/\nPEFT':             [0, 0, 0, 0, 0, 0, 15],
+    'Distillation':            [0, 1, 1, 1, 0, 0, 15],
+}
+fig, ax = plt.subplots(figsize=(COL_W, 3.3))
+nP = len(plats)
+for xi, t in enumerate(techs):
+    for pi, v in enumerate(M[t]):
+        yy = nP - 1 - pi
+        if v == 0:
+            continue
+        unspec = plats[pi] == 'Unspecified'
+        s = 55 + v * 38 if not unspec else 110 + v * 18
+        ax.scatter(xi, yy, s=s, color=SLATE if unspec else NAVY, alpha=0.9 if unspec else 1,
+                   edgecolors='white', linewidths=0.6, zorder=3)
+        ax.text(xi, yy, str(v), ha='center', va='center', fontsize=7.3, weight='bold',
+                color='white', zorder=4)
+ax.axhline(0.5, color=SLATE, ls='--', lw=0.8, alpha=0.9)
+ax.text(len(techs) - 0.5, 0.56, 'no identifiable platform \u2193', ha='right', va='bottom',
+        fontsize=6.6, style='italic', color=ROSE)
+ax.set_xticks(range(len(techs)))
+ax.set_xticklabels(techs, fontsize=7.5, color=INK)
+ax.set_yticks(range(nP))
+ax.set_yticklabels(plats[::-1], fontsize=8, color=INK)
+ax.set_xlim(-0.55, len(techs) - 0.45)
+ax.set_ylim(-0.6, nP - 0.45)
+ax.grid(True, ls='--', alpha=0.35, color=GRID, zorder=0)
+ax.tick_params(length=0)
+for s in ax.spines.values():
+    s.set_visible(False)
+fig.tight_layout()
+save(fig, 'grafico_rq4_matriz', 'pdf')

@@ -1,0 +1,26 @@
+Keyword,Centrality,Density,Frequency
+Large language models,106.0,2.2847682119205297,41
+Quantization,83.0,2.4324324324324325,23
+Computational modeling,108.0,2.2635135135135136,21
+Knowledge distillation,18.0,3.4146341463414633,14
+Adaptation models,64.0,2.645669291338583,11
+Model compression,14.0,3.95,10
+Training,46.0,3.0352941176470587,10
+Hardware,37.0,2.966292134831461,9
+Edge computing,16.0,3.1714285714285713,9
+Deep learning,19.0,2.95,8
+Memory management,41.0,3.1875,7
+Optimization,24.0,3.0919540229885056,7
+Servers,34.0,3.2375,6
+Natural language processing,8.0,2.8333333333333335,6
+Transformers,38.0,3.1354166666666665,6
+Vectors,31.0,3.05,6
+Accuracy,30.0,3.693548387096774,6
+Mobile handsets,27.0,3.8518518518518516,5
+Artificial intelligence,21.0,3.225,5
+Computer architecture,23.0,3.6031746031746033,5
+Performance evaluation,33.0,3.5625,5
+Field programmable gate arrays,23.0,3.575,5
+Decoding,22.0,3.5084745762711864,4
+Costs,23.0,3.6530612244897958,4
+Fpga,13.0,4.428571428571429,4

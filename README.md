@@ -18,6 +18,7 @@ Universidad Tecnológica del Perú — Ingeniería de Sistemas e Informática
 | `tablas/` | Tablas LaTeX generadas, listas para `\input` |
 | `graficos_sin_titulo/` | Figuras sin título, para insertar en el manuscrito |
 | `graficos_fuente_grande/` | Variantes con tipografía ampliada |
+| `gen_figuras_en.py` | Figuras del manuscrito en inglés, a una columna (FGCS doble columna) -> `figuras_en/` |
 
 ## Hojas del libro de datos
 
