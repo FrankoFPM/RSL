@@ -2,7 +2,7 @@
 
 Materiales de replicación de la revisión sistemática de literatura sobre técnicas de optimización de Modelos de Lenguaje de Gran Escala (LLMs) para despliegue en hardware perimetral (2024–2026).
 
-**Autores:** Johann Gudwig Camiloaga Cuenca, Franco Johan Perez Melgarejo
+**Autores:** Johann Gudwig Camiloaga Cuenca, Franco Johan Perez Melgarejo, Juan A. Alcántara-Núñez
 Universidad Tecnológica del Perú — Ingeniería de Sistemas e Informática
 
 ---
@@ -19,6 +19,13 @@ Universidad Tecnológica del Perú — Ingeniería de Sistemas e Informática
 | `graficos_sin_titulo/` | Figuras sin título, para insertar en el manuscrito |
 | `graficos_fuente_grande/` | Variantes con tipografía ampliada |
 | `gen_figuras_en.py` | Figuras del manuscrito en inglés, a una columna (FGCS doble columna) -> `figuras_en/` |
+| `codificacion_rq4.csv` | Codificación por estudio (n=80): familia de optimización y clase de plataforma. Fuente única de la Tabla de frecuencias y de la Figura de la RQ4 |
+| `gen_figura_rq4.py` | Matriz técnica x plataforma (RQ4) desde `codificacion_rq4.csv` (`en` por defecto, `es` opcional) |
+| `correccion_keywords_log.csv` | Registro de la corrección de palabras clave (ver nota abajo) |
+
+## Nota de corrección (octubre 2026)
+
+En las hojas `SELECCIONADOS`, `SELECCIONADOS-CRIBADO`, `SELECCIONADOS-FINAL` y `VERIFICAR-ACCESS`, las columnas de palabras clave (`DE`, `ID`) de algunas filas estaban desalineadas respecto del resto del registro (contenían las palabras clave de otro artículo cercano). Autores, título, resumen, revista y citas sí estaban alineados. Las columnas `DE` e `ID` se reconstruyeron por DOI a partir de las exportaciones originales (`ARTICULOS SCOPUS`, `ARTICULOS WoS`). Cada celda modificada consta en `correccion_keywords_log.csv`. El mapa temático se regeneró con los datos corregidos.
 
 ## Hojas del libro de datos
 

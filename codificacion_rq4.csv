@@ -1,0 +1,81 @@
+cite_key,plataforma,cuantizacion,poda,lora_peft,destilacion,tecnica_anexoA,hardware_anexoA
+Sun2026,Sin plataforma perimetral,0,1,0,0,Network pruning,Consumer devices (personal computers and smartphones)
+Taylar2026,Sin plataforma perimetral,1,0,0,1,"4-bit quantization, Knowledge Distillation",Resource-constrained hardware
+Ma2026a,Sin plataforma perimetral,1,0,1,0,"LoRA fine-tuning, static quantization",5G private network
+Yao2025,Sin plataforma perimetral,0,0,0,0,"Model architecture, training, and data efficiency",Edge devices and mobile phones
+Zhang2025b,Sin plataforma perimetral,1,0,0,0,ABC-Arc and dynamic post-training quantization (DynPTQ),Resource-constrained edge computing scenarios
+Huang2026,Sin plataforma perimetral,0,0,0,0,"Speculative decoding (SD), bandwidth-aware dynamic image token merging (ITM), and adaptive scalable token tree structure",Heterogeneous edge servers (ESs)
+Netisopakul2025,GPU de escritorio/servidor,1,0,0,0,Quantization and Retrieval Augmented Generation (RAG),GPU
+Shreshthi2026,GPU de escritorio/servidor,1,0,1,0,"Low-Rank Adaptation (LoRA), 4-bit post-training quantization","NVIDIA A100 GPU, Edge devices"
+Liu2025b,Sin plataforma perimetral,0,1,0,1,"Knowledge distillation, sparse connection mechanisms, attention head pruning","Resource-constrained devices, mobile devices"
+Wu2026,Sin plataforma perimetral,0,0,0,1,"Knowledge graphs (KGs), Knowledge distillation (KD), fine-tuning",Resource-constrained edge nodes
+Shen2024,Sin plataforma perimetral,1,1,0,0,"Hardware-oriented token adaptive Quantization (HotaQ), 4-bit quantization, activation quantization, activation-aware token pruning, SIMD-based 4-bit multiplier, TRIP matrix multiplication, DSP packing techniques","Edge devices (genérico), FPGAs"
+Lee2026,Sin plataforma perimetral,1,0,1,0,Quantization and LoRA adapters,Edge devices and cloud servers
+Kwon2025,Sin plataforma perimetral,1,1,1,0,"Post-training quantization (PTQ), sparse + low-rank decomposition, outlier-aware pruning, Hessian-aware quantization",Resource-constrained environments
+Yi2025,Sin plataforma perimetral,1,0,0,0,"expert-wise bitwidth adaptation, expert preloading",Edge devices
+Cho2025,Sin plataforma perimetral,1,0,0,0,"Mixed-precision quantization, scaled power-of-two logarithmic quantization",Edge devices
+Piccialli2025,Sin plataforma perimetral,1,1,0,0,"Model pruning, model quantization",Federated and edge environments
+Pang2026b,Sin plataforma perimetral,0,1,0,0,Joint client-specific pruning and bandwidth allocation (JCPBA),Resource-constrained edge clients
+Tao2025,Sin plataforma perimetral,0,1,1,0,"Layer-Selective Pruning, low-Rank Approximation, Sparsification Method, Dynamic Rank Selection, unstructured pruning, LoRA",resource-constrained devices
+Gao2024,GPU de escritorio/servidor,0,0,0,0,Model parameter scaling and unified adaptation framework,Consumer-grade GPUs and edge devices
+Zheng2026a,Jetson,0,1,0,0,"Structurally-aware adaptive pruning (SAAP), Bayesian fusion, cross-layer importance alignment, block-wise fine-tuning","IoT devices, NVIDIA Jetson AGX Orin"
+Wang2026,Sin plataforma perimetral,0,1,0,0,"Split federated learning, differential privacy, dynamic pruning, adaptive beamforming, resource allocation optimization",Edge devices
+Pletenev2024,Sin plataforma perimetral,0,0,1,0,Low-rank factorization,Resource-constrained or latency-sensitive applications
+Prasika2026,Sin plataforma perimetral,1,0,1,0,Parameter efficient fine tuning and quantization,Low-resource-constrained devices
+Chong2025,Sin plataforma perimetral,0,0,0,1,Knowledge distillation,Resource-constrained environments
+Zhang2026,Sin plataforma perimetral,1,0,0,0,"Quantize-sample (Q-S) strategy, adaptive mechanism, quantization",Edge devices
+Ratsapa2025,Sin plataforma perimetral,0,1,0,0,Combinatorial optimization (Particle Swarm Optimization and Whale Optimization Algorithm),No especificado
+Huang2024,Sin plataforma perimetral,1,0,1,0,"low-bit quantization, LoRA fine-tuning (LoRA-FT)",Edge devices
+Zheng2026b,Sin plataforma perimetral,1,0,0,0,Low-bit quantization,Resource-constrained environments
+Eccles2026,Sin plataforma perimetral,0,1,0,0,Projection pruning and composite projection pruning,Multiple hardware platforms
+Kollinal2025,Sin plataforma perimetral,1,0,0,0,"Hybrid Cognitive Model, paged KV-cache, model quantization (INT4/INT8), neuromorphic-based Spiking Neural Networks (SNNs)",Cloud-Edge-Device hierarchy
+Xu2026,Sin plataforma perimetral,0,1,0,0,Post-training structured hybrid-granularity pruning,Resource-constrained devices
+Ragsdale2026,Jetson,1,1,0,1,"pruning, INT8 quantization-aware training, distillation, and platform tuning","Raspberry Pi 5, Radxa ROCK 5B Plus, NVIDIA Jetson Nano"
+Shao2025,SoC ARM / RPi / NPU,1,0,0,0,Low-bit quantization and resolution reduction,Qualcomm Snapdragon 8Gen3
+Liu2026b,Sin plataforma perimetral,1,0,0,0,Generative Pre-trained Transformer Quantization (GPTQ),Resource-constrained maritime environments
+Ahmadpanah2025,Sin plataforma perimetral,0,1,0,0,Task-specific dynamic token pruning,Resource-constrained environments
+Pang2026a,Sin plataforma perimetral,1,0,0,0,"Resource Awareness-Based Salience-Weighted Mixed-Precision Quantization (RAS-MQ), integer linear programming, training-free quantization range clipping",Mobile devices
+Oprea2026,GPU de escritorio/servidor,1,0,0,0,INT8 post-training quantization (PTQ),"NVIDIA RTX4070 Laptop GPU, RTX4080 Laptop GPU"
+Parashar2026,Jetson,1,0,0,0,Dynamic Adapter + 4-bit quant.,NVIDIA Jetson Xavier NX
+Liu2026,Sin plataforma perimetral,1,0,0,0,White-box feature analysis and Int8 quantization,Resource-constrained devices
+Toksoz2025,GPU de escritorio/servidor,1,0,1,0,Low-Rank Adaptation (LoRA) and QLoRA,A100
+Pradhan2026,GPU de escritorio/servidor,0,0,0,1,Knowledge Distillation and model compression,Consumer hardware (Apple M1)
+Zhang2025c,Sin plataforma perimetral,1,1,0,1,"Quantization, model pruning, and knowledge distillation",Mobile and edge devices
+Cho2024,Sin plataforma perimetral,1,0,0,0,Differentiable KMeans Clustering (DKM) and weight-clustering,Smartphones (Genérico)
+Zhou2026,Sin plataforma perimetral,0,1,0,0,Structured pruning,Resource-constrained settings
+Husom2025,SoC ARM / RPi / NPU,1,0,0,0,"PTQ weight-only (q3, q4, q8)",Raspberry Pi 4 (4GB)
+Zhao2025,Sin plataforma perimetral,0,1,0,0,"Hardware-aware pruning, cross-layer optimization, and compilation optimization",General-purpose hardware/edge devices
+Walkowiak2024,GPU de escritorio/servidor,1,0,0,0,Quantization and CPU-based model implementations,GPU and CPU
+Martinez2025,Sin plataforma perimetral,1,0,0,0,"Quantization, mixed-precision, cache optimization",ARM and RISC-V platforms
+Xu2025,Sin plataforma perimetral,1,0,0,0,Channel-Relaxed Vector Quantization (CRVQ),Resource-constrained devices
+Abstreiter2026,GPU de escritorio/servidor,1,0,0,0,Quantization and model compression techniques,CPU-based and GPU-accelerated edge devices
+Hou2026,Sin plataforma perimetral,0,0,0,0,Game-theoretic Offloading Algorithm (GOALIT),Edge servers
+Yang2025,Sin plataforma perimetral,0,0,1,1,"Hierarchical Knowledge Distillation, GRPO, LoRA",Resource-constrained military environments
+Monteiro2026,SoC ARM / RPi / NPU,1,0,0,0,Ternary matrix quant.,SoC ZCU102 embebido
+Choi2026,SoC ARM / RPi / NPU,1,0,0,0,"Asynchronous pipeline, Voice Activity Detection (VAD), double-buffering, encoder-side KV projection relocation, hardware-aware mixed-precision quantization, and memory access alignment",alpha 11 AI Processor 4K Gen3 NPU
+Shen2026,Sin plataforma perimetral,0,0,0,0,"Difficulty-aware training paradigm, model merging, and post-tuning",Edge and resource-limited settings
+Zhang2025a,FPGA de servidor,0,1,0,0,fine-grained structured sparsity (FSS),Xilinx Alveo U280 (Servidor)
+Ntovas2026,Sin plataforma perimetral,0,0,1,0,Singular Value Decomposition (SVD) y dynamic compression rate allocation,Resource-constrained environments
+Bora2024,Sin plataforma perimetral,0,0,0,0,Retrieval-Augmented Generation (RAG) and Fine-tuning,Computationally resource-constrained environment
+Xue2026,Sin plataforma perimetral,0,0,0,1,Knowledge distillation,Edge devices
+Hendriks2026,Sin plataforma perimetral,0,0,0,1,Knowledge distillation,Resource-constrained environments
+Song2026,FPGA de servidor,1,0,0,0,Batch-mode centroid updates and hardware-efficient arithmetic operations,FPGA (Xilinx XCU280) (Servidor)
+Singh2025,FPGA de servidor,1,0,0,0,"Personal Self-Attention (PSA), Quantization to Lookup Table (LUT)",FPGA de servidor (Alveo U50)
+Zheng2024,Sin plataforma perimetral,1,1,0,1,"Distillation, quantization, model pruning, Mixture-of-Experts (MoE), generative adversarial network (GAN)",Resource-constrained devices
+Kim2025,Sin plataforma perimetral,0,0,1,1,Knowledge distillation and low-rank factorization,mobile and edge devices
+Ou2025,GPU de escritorio/servidor,1,0,0,0,"Mixture of Experts (MoE), Quantization, Offloading, Lookahead gate, Layer-wise gate alignment, Speculative expert scheduling","High-end GPUs, Edge devices"
+Liu2026a,Sin plataforma perimetral,1,0,1,0,"LoRA-based FedFT, activation quantization",Resource-constrained end devices
+Song2025,FPGA de servidor,1,0,0,0,Inverted file with product quantization (IVF-PQ),FPGA (Alveo U280) (Servidor)
+Park2026,Sin plataforma perimetral,1,0,0,0,"Rotation-based quantization, Selective outlier injection",Resource-constrained environments
+Ando2025,SoC ARM / RPi / NPU,0,0,0,0,CGRAs,SoC ARM Cortex-A72 / ASIC
+Zhang2025d,Sin plataforma perimetral,0,0,0,1,"Spike-Driven Transformer (SDT), spike-based attention, residual mechanisms, cross-modality Knowledge Distillation",Edge devices / Resource-constrained environments
+Liu2026c,Sin plataforma perimetral,0,0,0,1,Intent-oriented Knowledge Distillation (IoKD) and Symbiotic Reinforcement Learning (SRL),Edge devices
+Liu2025a,Sin plataforma perimetral,1,0,0,0,Activation-aware weight quantization,Standard OCT hardware
+Rayhan2026,Sin plataforma perimetral,1,0,1,0,"Weighted Low-Rank Adaptation (LoRA) adapter fusion, output-level ensembling strategy, and 4-bit quantization",Resource-constrained environments
+Algawiaz2026,Sin plataforma perimetral,0,1,0,1,"Adaptive token-pruning, Knowledge Distillation",Edge devices
+Wang2024,Sin plataforma perimetral,0,0,0,0,DNN block swapping,Edge AI devices
+Wang2026b,Sin plataforma perimetral,0,0,0,1,"Curriculum reinforcement learning, symbolic execution, and Knowledge Distillation",Resource-constrained environments
+Ma2026b,FPGA de servidor,1,0,0,0,"Importance-aware quantization, memory-aligned data packing, Compute-Dedicated architecture, heterogeneous multi-FPGA system",U250 FPGA (Servidor)
+Zeng2025,Sin plataforma perimetral,1,0,0,0,"Per-Channel Quantization, Per-Token Quantization, Dynamic Window Quantization, y Attention Sink-Aware Quantization",Edge devices
+Mitra2026,Sin plataforma perimetral,0,0,0,1,"Knowledge Distillation (KD), adaptive attention-based fusion, temperature scaling, Contrastive Learning",Resource-constrained environments
+Shen2025,Sin plataforma perimetral,1,0,1,0,QLoRA (Parameter-Efficient Fine-Tuning y quantization),Resource-constrained environments

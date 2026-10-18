@@ -57,10 +57,13 @@ def save(fig, stem, main_ext):
 
 
 # =================================================================== 1. FREQUENCY
-tec = [('Quantization', 47),
-       ('Pruning and\nsparsity induction', 25),
-       ('Low-rank adaptation\n(LoRA / PEFT)', 18),
-       ('Knowledge\ndistillation', 17)][::-1]
+import csv as _csv
+_rows = list(_csv.DictReader(open('codificacion_rq4.csv', encoding='utf8')))
+_n = lambda c: sum(int(r[c]) for r in _rows)   # conteos desde la codificacion por estudio (n=80)
+tec = [('Quantization', _n('cuantizacion')),
+       ('Pruning and\nsparsity induction', _n('poda')),
+       ('Knowledge\ndistillation', _n('destilacion')),
+       ('Low-rank (LoRA/PEFT\nand factorization)', _n('lora_peft'))][::-1]
 fig, ax = plt.subplots(figsize=(COL_W, 2.35))
 y = list(range(len(tec)))
 bars = ax.barh(y, [v for _, v in tec], height=0.62, color=NAVY, zorder=3)
@@ -115,9 +118,9 @@ rows = [  # (phase, main text, side text, main style)
      'Studies included\nin the review (n = 80)\n\n2024: n = 9\n2025: n = 31\n2026: n = 40',
      None, 'highlight'),
 ]
-note = ('18 of the 80 included studies (22%) report a\nconcrete edge hardware platform. The remaining 62\n'
-        'use generic descriptors or validate on GPUs outside\nthe edge scope. 36 studies (45%) were coded from\n'
-        'the abstract and indexed metadata.')
+note = ('8 of the 80 included studies (10%) report a concrete\nedge platform with physical metrics. The remaining 72\n'
+        'use generic descriptors or validate on server GPUs or\nFPGAs outside the edge scope. 36 studies (45%) were coded\n'
+        'from the abstract and indexed metadata.')
 
 layout, y = [], 0
 for ph, mt, st, style in rows:
@@ -227,23 +230,23 @@ quad = [
 # Label positions fixed by hand (adjustText crossed leaders over the dense cluster).
 # (dx, dy) in data units from the bubble centre, plus alignment.
 LAB = {
-    'Large language models':  (4, 0.22, 'center', 'bottom'),
-    'Computational modeling': (-11, -0.09, 'right', 'center'),
-    'Quantization':           (-6, 0.0, 'right', 'center'),
-    'Adaptation models':      (0, 0.09, 'center', 'bottom'),
-    'Training':               (4, 0.0, 'left', 'center'),
-    'Hardware':               (0, -0.11, 'center', 'top'),
-    'Deep learning':          (-3.5, 0.0, 'right', 'center'),
-    'Edge computing':         (-3.5, 0.0, 'right', 'center'),
-    'Knowledge distillation': (22, 0.0, 'left', 'center'),
-    'Model compression':      (4, 0.03, 'left', 'center'),
+    'Large language models':  (6, 0.42, 'center', 'bottom'),
+    'Computational modeling': (-34, -0.10, 'center', 'top'),
+    'Quantization':           (-12, 0.0, 'right', 'center'),
+    'Knowledge distillation': (8, 0.0, 'left', 'center'),
+    'Model compression':      (12, 0.60, 'left', 'center'),
+    'Hardware':               (24, 0.35, 'left', 'center'),
+    'Training':               (14, 0.32, 'left', 'center'),
+    'Adaptation models':      (14, 0.04, 'left', 'center'),
+    'Optimization':           (5, -0.30, 'left', 'center'),
+    'Deep learning':          (-6, 0.40, 'center', 'bottom'),
 }
 top = th.nlargest(10, 'Frequency')
 SHOW = {'Large language models': 'Large language\nmodels', 'Adaptation models': 'Adaptation\nmodels',
         'Edge computing': 'Edge\ncomputing', 'Deep learning': 'Deep\nlearning'}
 for _, r in top.iterrows():
     dx, dy, ha, va = LAB.get(r['Keyword'], (3, 0, 'left', 'center'))
-    far = abs(dx) > 6 or abs(dy) > 0.12
+    far = abs(dx) > 3 or abs(dy) > 0.08
     ax.annotate(SHOW.get(r['Keyword'], r['Keyword']), (r['Centrality'], r['Density']),
                 xytext=(r['Centrality'] + dx, r['Density'] + dy), ha=ha, va=va,
                 fontsize=7, weight='bold', color=NAVY, zorder=5, linespacing=1.0,
@@ -260,41 +263,7 @@ save(fig, 'image6', 'png')
 
 
 # =================================================================== 4. RQ4 MATRIX
-# Counts of studies per optimisation family x declared hardware platform (Annex A).
-# Identical to the Spanish figure; transposed (platforms as rows) to fit one column.
-techs = ['Quantization', 'Pruning/\nsparsity', 'LoRA/\nPEFT', 'Distillation']
-plats = ['FPGA', 'Jetson', 'SBC (RPi)', 'Mobile SoC', 'NPU / ASIC', 'ARM / RISC-V', 'Unspecified']
-M = {  # tech -> platform counts
-    'Quantization':            [5, 2, 2, 1, 1, 1, 32],
-    'Pruning/\nsparsity':      [2, 2, 1, 1, 0, 0, 14],
-    'LoRA/\nPEFT':             [0, 0, 0, 0, 0, 0, 15],
-    'Distillation':            [0, 1, 1, 1, 0, 0, 15],
-}
-fig, ax = plt.subplots(figsize=(COL_W, 3.3))
-nP = len(plats)
-for xi, t in enumerate(techs):
-    for pi, v in enumerate(M[t]):
-        yy = nP - 1 - pi
-        if v == 0:
-            continue
-        unspec = plats[pi] == 'Unspecified'
-        s = 55 + v * 38 if not unspec else 110 + v * 18
-        ax.scatter(xi, yy, s=s, color=SLATE if unspec else NAVY, alpha=0.9 if unspec else 1,
-                   edgecolors='white', linewidths=0.6, zorder=3)
-        ax.text(xi, yy, str(v), ha='center', va='center', fontsize=7.3, weight='bold',
-                color='white', zorder=4)
-ax.axhline(0.5, color=SLATE, ls='--', lw=0.8, alpha=0.9)
-ax.text(len(techs) - 0.5, 0.56, 'no identifiable platform \u2193', ha='right', va='bottom',
-        fontsize=6.6, style='italic', color=ROSE)
-ax.set_xticks(range(len(techs)))
-ax.set_xticklabels(techs, fontsize=7.5, color=INK)
-ax.set_yticks(range(nP))
-ax.set_yticklabels(plats[::-1], fontsize=8, color=INK)
-ax.set_xlim(-0.55, len(techs) - 0.45)
-ax.set_ylim(-0.6, nP - 0.45)
-ax.grid(True, ls='--', alpha=0.35, color=GRID, zorder=0)
-ax.tick_params(length=0)
-for s in ax.spines.values():
-    s.set_visible(False)
-fig.tight_layout()
-save(fig, 'grafico_rq4_matriz', 'pdf')
+# Generada por gen_figura_rq4.py a partir de codificacion_rq4.csv (fuente unica de los conteos).
+import subprocess, sys
+subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gen_figura_rq4.py'), 'en'], check=True)
+print('[ok] grafico_rq4_matriz.pdf')
