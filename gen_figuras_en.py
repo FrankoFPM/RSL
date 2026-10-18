@@ -69,11 +69,11 @@ y = list(range(len(tec)))
 bars = ax.barh(y, [v for _, v in tec], height=0.62, color=NAVY, zorder=3)
 bars[-1].set_color(ROSE)
 for i, (_, v) in enumerate(tec):
-    ax.text(v + 0.8, i, f'{v} ({v/80*100:.0f}%)', va='center', ha='left',
+    ax.text(v + 0.8, i, f'{v} ({v/len(_rows)*100:.0f}%)', va='center', ha='left',
             fontsize=8.5, weight='bold', color=INK)
 ax.set_yticks(y)
 ax.set_yticklabels([k for k, _ in tec], fontsize=8.5, color=INK)
-ax.set_xlabel('Number of studies (n = 80)', labelpad=5)
+ax.set_xlabel(f'Number of studies (n = {len(_rows)})', labelpad=5)
 ax.set_xlim(0, 60)
 ax.set_xticks(range(0, 51, 10))
 ax.tick_params(axis='x', colors=SLATE)
@@ -114,12 +114,16 @@ rows = [  # (phase, main text, side text, main style)
      'Records screened by\ntitle and abstract\n(n = 149)',
      'Records excluded (n = 69)\n\nOff-topic, general AI,\nor simulation without\na real physical\nconstraint\n(fails IC-2 / meets EC-1)',
      'normal'),
+    ('SCREENING',
+     'Full-text articles\nassessed for\neligibility (n = 80)',
+     'Excluded at full text\n(n = 7)\n\nDo not optimize or\nevaluate an LLM',
+     'normal'),
     ('INCLUDED',
-     'Studies included\nin the review (n = 80)\n\n2024: n = 9\n2025: n = 31\n2026: n = 40',
+     'Studies included\nin the review (n = 73)\n\n2024: n = 8\n2025: n = 28\n2026: n = 37',
      None, 'highlight'),
 ]
-note = ('8 of the 80 included studies (10%) report a concrete\nedge platform with physical metrics. The remaining 72\n'
-        'use generic descriptors or validate on server GPUs or\nFPGAs outside the edge scope. 36 studies (45%) were coded\n'
+note = ('6 of the 73 included studies (8%) report a concrete\nedge platform with physical metrics. The remaining 67\n'
+        'use generic descriptors or validate on server GPUs or\nFPGAs outside the edge scope. 33 studies (45%) were coded\n'
         'from the abstract and indexed metadata.')
 
 layout, y = [], 0
@@ -230,15 +234,17 @@ quad = [
 # Label positions fixed by hand (adjustText crossed leaders over the dense cluster).
 # (dx, dy) in data units from the bubble centre, plus alignment.
 LAB = {
-    'Large language models':  (6, 0.42, 'center', 'bottom'),
+    'Large language models':  (4, 0.42, 'center', 'bottom'),
     'Computational modeling': (-34, -0.10, 'center', 'top'),
     'Quantization':           (-12, 0.0, 'right', 'center'),
     'Knowledge distillation': (8, 0.0, 'left', 'center'),
-    'Model compression':      (12, 0.60, 'left', 'center'),
-    'Hardware':               (24, 0.35, 'left', 'center'),
-    'Training':               (14, 0.32, 'left', 'center'),
-    'Adaptation models':      (14, 0.04, 'left', 'center'),
-    'Optimization':           (5, -0.30, 'left', 'center'),
+    'Model compression':      (27, 0.63, 'left', 'center'),
+    'Accuracy':               (17, 0.47, 'left', 'center'),
+    'Training':               (17, 0.30, 'left', 'center'),
+    'Adaptation models':      (15, 0.02, 'left', 'center'),
+    'Optimization':           (-28, -0.60, 'left', 'center'),
+    'Edge computing':         (6, 1.30, 'center', 'bottom'),
+    'Hardware':               (20, 0.35, 'left', 'center'),
     'Deep learning':          (-6, 0.40, 'center', 'bottom'),
 }
 top = th.nlargest(10, 'Frequency')

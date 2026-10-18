@@ -52,28 +52,21 @@ Abstreiter2026,GPU de escritorio/servidor,1,0,0,0,Quantization and model compres
 Hou2026,Sin plataforma perimetral,0,0,0,0,Game-theoretic Offloading Algorithm (GOALIT),Edge servers
 Yang2025,Sin plataforma perimetral,0,0,1,1,"Hierarchical Knowledge Distillation, GRPO, LoRA",Resource-constrained military environments
 Monteiro2026,SoC ARM / RPi / NPU,1,0,0,0,Ternary matrix quant.,SoC ZCU102 embebido
-Choi2026,SoC ARM / RPi / NPU,1,0,0,0,"Asynchronous pipeline, Voice Activity Detection (VAD), double-buffering, encoder-side KV projection relocation, hardware-aware mixed-precision quantization, and memory access alignment",alpha 11 AI Processor 4K Gen3 NPU
 Shen2026,Sin plataforma perimetral,0,0,0,0,"Difficulty-aware training paradigm, model merging, and post-tuning",Edge and resource-limited settings
 Zhang2025a,FPGA de servidor,0,1,0,0,fine-grained structured sparsity (FSS),Xilinx Alveo U280 (Servidor)
 Ntovas2026,Sin plataforma perimetral,0,0,1,0,Singular Value Decomposition (SVD) y dynamic compression rate allocation,Resource-constrained environments
 Bora2024,Sin plataforma perimetral,0,0,0,0,Retrieval-Augmented Generation (RAG) and Fine-tuning,Computationally resource-constrained environment
-Xue2026,Sin plataforma perimetral,0,0,0,1,Knowledge distillation,Edge devices
 Hendriks2026,Sin plataforma perimetral,0,0,0,1,Knowledge distillation,Resource-constrained environments
-Song2026,FPGA de servidor,1,0,0,0,Batch-mode centroid updates and hardware-efficient arithmetic operations,FPGA (Xilinx XCU280) (Servidor)
-Singh2025,FPGA de servidor,1,0,0,0,"Personal Self-Attention (PSA), Quantization to Lookup Table (LUT)",FPGA de servidor (Alveo U50)
 Zheng2024,Sin plataforma perimetral,1,1,0,1,"Distillation, quantization, model pruning, Mixture-of-Experts (MoE), generative adversarial network (GAN)",Resource-constrained devices
 Kim2025,Sin plataforma perimetral,0,0,1,1,Knowledge distillation and low-rank factorization,mobile and edge devices
 Ou2025,GPU de escritorio/servidor,1,0,0,0,"Mixture of Experts (MoE), Quantization, Offloading, Lookahead gate, Layer-wise gate alignment, Speculative expert scheduling","High-end GPUs, Edge devices"
 Liu2026a,Sin plataforma perimetral,1,0,1,0,"LoRA-based FedFT, activation quantization",Resource-constrained end devices
-Song2025,FPGA de servidor,1,0,0,0,Inverted file with product quantization (IVF-PQ),FPGA (Alveo U280) (Servidor)
 Park2026,Sin plataforma perimetral,1,0,0,0,"Rotation-based quantization, Selective outlier injection",Resource-constrained environments
-Ando2025,SoC ARM / RPi / NPU,0,0,0,0,CGRAs,SoC ARM Cortex-A72 / ASIC
-Zhang2025d,Sin plataforma perimetral,0,0,0,1,"Spike-Driven Transformer (SDT), spike-based attention, residual mechanisms, cross-modality Knowledge Distillation",Edge devices / Resource-constrained environments
+Ando2025,Sin plataforma perimetral,0,0,0,0,CGRAs,SoC ARM Cortex-A72 / ASIC
 Liu2026c,Sin plataforma perimetral,0,0,0,1,Intent-oriented Knowledge Distillation (IoKD) and Symbiotic Reinforcement Learning (SRL),Edge devices
 Liu2025a,Sin plataforma perimetral,1,0,0,0,Activation-aware weight quantization,Standard OCT hardware
 Rayhan2026,Sin plataforma perimetral,1,0,1,0,"Weighted Low-Rank Adaptation (LoRA) adapter fusion, output-level ensembling strategy, and 4-bit quantization",Resource-constrained environments
 Algawiaz2026,Sin plataforma perimetral,0,1,0,1,"Adaptive token-pruning, Knowledge Distillation",Edge devices
-Wang2024,Sin plataforma perimetral,0,0,0,0,DNN block swapping,Edge AI devices
 Wang2026b,Sin plataforma perimetral,0,0,0,1,"Curriculum reinforcement learning, symbolic execution, and Knowledge Distillation",Resource-constrained environments
 Ma2026b,FPGA de servidor,1,0,0,0,"Importance-aware quantization, memory-aligned data packing, Compute-Dedicated architecture, heterogeneous multi-FPGA system",U250 FPGA (Servidor)
 Zeng2025,Sin plataforma perimetral,1,0,0,0,"Per-Channel Quantization, Per-Token Quantization, Dynamic Window Quantization, y Attention Sink-Aware Quantization",Edge devices

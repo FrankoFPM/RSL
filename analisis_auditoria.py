@@ -108,7 +108,7 @@ def main():
     for hoja, esperado, etiqueta in [('ARTICULOS SCOPUS', 586, 'Scopus'),
                                      ('ARTICULOS WoS', 138, 'WoS'),
                                      ('SELECCIONADOS', 149, 'Tras cribado'),
-                                     (HOJA_FINAL, 80, 'Corpus final')]:
+                                     (HOJA_FINAL, 73, 'Corpus final')]:
         if hoja in xl.sheet_names:
             real = len(pd.read_excel(EXCEL, sheet_name=hoja))
             estado = 'OK' if real == esperado else f'DISCREPANCIA (esperado {esperado})'

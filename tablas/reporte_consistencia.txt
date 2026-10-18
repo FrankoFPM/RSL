@@ -1,21 +1,21 @@
-Corpus: 80 estudios (hoja 'SELECCIONADOS-FINAL')
+Corpus: 73 estudios (hoja 'SELECCIONADOS-FINAL')
 
 == RECONCILIACION PRISMA ==
   Scopus        :  586  OK
   WoS           :  138  OK
   Tras cribado  :  149  OK
-  Corpus final  :   80  OK
+  Corpus final  :   73  OK
 
 == ACCESO A TEXTO COMPLETO ==
-  Sin acceso: 36/80 (45%)
+  Sin acceso: 33/73 (45%)
 
 == BIBLIOMETRIA ==
-  Fuentes normalizadas: 57
-  Zonas Bradford: Z1=7 rev/28 art; Z2=25 rev/27 art; Z3=25 rev/25 art
-  Multiplicadores: [3.57, 1.0]  -> Bradford NO se cumple
-  Fuentes con 1 articulo: 48/57 (84%)
-  Autores unicos: 398; con 1 articulo: 379 (95.2%)
-  Estudios con 0 citas: 43/80 (54%)
+  Fuentes normalizadas: 54
+  Zonas Bradford: Z1=7 rev/26 art; Z2=25 rev/25 art; Z3=22 rev/22 art
+  Multiplicadores: [3.57, 0.88]  -> Bradford NO se cumple
+  Fuentes con 1 articulo: 47/54 (87%)
+  Autores unicos: 371; con 1 articulo: 355 (95.7%)
+  Estudios con 0 citas: 40/73 (55%)
 
 == RQ3 - PLATAFORMAS ==
   Con hardware Edge concreto : 18/80 (22%)

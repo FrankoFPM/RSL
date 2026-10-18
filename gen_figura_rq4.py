@@ -21,10 +21,10 @@ import sys
 LANG = sys.argv[1] if len(sys.argv) > 1 else 'en'   # 'en' (por defecto, como el resto de figuras) o 'es'
 T = {
  'en': {'fam': ['Quanti-\nzation', 'Pruning /\nsparsity', 'Low-rank\n(LoRA/PEFT)', 'Distil-\nlation'],
-        'plat': ['Jetson', 'ARM SoC / RPi / NPU', 'Server FPGA', 'Desktop/server GPU', 'No edge platform'],
+        'plat': ['Jetson', 'ARM SoC / RPi', 'Server FPGA', 'Desktop/server GPU', 'No edge platform'],
         'edge': 'Edge (Group A) \u2191'},
  'es': {'fam': ['Cuanti-\nzación', 'Poda /\nesparsidad', 'Rango bajo\n(LoRA/PEFT)', 'Destila-\nción'],
-        'plat': ['Jetson', 'SoC ARM / RPi / NPU', 'FPGA de servidor', 'GPU de escritorio/servidor', 'Sin plataforma perimetral'],
+        'plat': ['Jetson', 'SoC ARM / RPi', 'FPGA de servidor', 'GPU de escritorio/servidor', 'Sin plataforma perimetral'],
         'edge': 'Edge (Grupo A) \u2191'},
 }[LANG]
 OUT = os.path.join(HERE, 'figuras_en' if LANG == 'en' else 'figuras'); os.makedirs(OUT, exist_ok=True)
