@@ -89,47 +89,47 @@ save(fig, 'grafico_frecuencia', 'pdf')
 # =================================================================== 2. PRISMA
 # Coordinates are in points (1/72 in) so box sizes follow the text they hold.
 W = COL_W * 72
-FS, FS_SIDE, LS = 7.5, 6.6, 1.25
-GAP, PAD = 13, 9
+FS, FS_SIDE, LS = 8.4, 7.3, 1.08
+GAP, PAD = 7, 4
 PH_X, PH_W = 0, 13                 # phase band
-MX, MW = 19, 125                   # main column
-SX = MX + MW + 12                  # side column
+MX, MW = 17, 106                   # main column
+SX = MX + MW + 8                  # side column
 SW = W - SX
 
 
 def h_of(text, fs):
-    return len(text.split('\n')) * fs * LS * 1.18 + 2 * PAD
+    return len(text.split('\n')) * fs * LS * 1.12 + 2 * PAD
 
 
 rows = [  # (phase, main text, side text, main style)
     ('IDENTIFICATION',
-     'Records identified\nfrom databases (n = 724)\n\nScopus: n = 586\nWeb of Science: n = 138',
-     'No date restriction\nin the initial search\n(literature since 2003)', 'normal'),
+     'Records identified\nfrom databases\n(n = 724)\nScopus: n = 586\nWoS: n = 138',
+     'No date restriction in the\ninitial search (literature\nsince 2003)', 'normal'),
     ('SCREENING',
      'Records after\nde-duplication and\npreliminary screening\n(n = 149)',
-     'Records excluded (n = 575)\n\nDuplicates: n = 171\n(127 cross-database,\n44 internal)\n'
-     'Non-primary type\n(EC-4): n = 385\nLanguage (IC-4): n = 5\nSecondary literature or\nincomplete metadata:\nn = 14',
+     'Records excluded (n = 575)\nDuplicates: n = 171\n(127 cross-db, 44 internal)\n'
+     'Non-primary (EC-4): n = 385\nLanguage (IC-4): n = 5\nSecondary or incomplete\nmetadata: n = 14',
      'normal'),
     ('SCREENING',
      'Records screened by\ntitle and abstract\n(n = 149)',
-     'Records excluded (n = 69)\n\nOff-topic, general AI,\nor simulation without\na real physical\nconstraint\n(fails IC-2 / meets EC-1)',
+     'Records excluded (n = 69)\nOff-topic, general AI, or\nsimulation without a real\nphysical constraint\n(fails IC-2 / meets EC-1)',
      'normal'),
     ('SCREENING',
      'Full-text articles\nassessed for\neligibility (n = 80)',
-     'Excluded at full text\n(n = 7)\n\nDo not optimize or\nevaluate an LLM',
+     'Excluded at full text (n = 7)\nDo not optimize or\nevaluate an LLM',
      'normal'),
     ('INCLUDED',
-     'Studies included\nin the review (n = 73)\n\n2024: n = 8\n2025: n = 28\n2026: n = 37',
+     'Studies included\nin the review\n(n = 73)\n2024: 8 | 2025: 28\n2026: 37',
      None, 'highlight'),
 ]
-note = ('6 of the 73 included studies (8%) report a concrete\nedge platform with physical metrics. The remaining 67\n'
+note = ('9 of the 73 included studies (12%) report a concrete\nedge platform with physical metrics. The remaining 64\n'
         'use generic descriptors or validate on server GPUs or\nFPGAs outside the edge scope. 33 studies (45%) were coded\n'
         'from the abstract and indexed metadata.')
 
 layout, y = [], 0
 for ph, mt, st, style in rows:
     hm, hs = h_of(mt, FS), (h_of(st, FS_SIDE) if st else 0)
-    rh = max(hm, hs, 70 if ph == 'IDENTIFICATION' else 0)
+    rh = max(hm, hs)
     layout.append((ph, mt, st, style, y, rh, hm, hs))
     y += rh + GAP
 hn = h_of(note, FS_SIDE)
@@ -150,7 +150,7 @@ def box(x, ytop, w, h, text, style='normal', fs=FS):
 
 
 def arrow(x1, y1, x2, y2):
-    ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle='-|>', mutation_scale=7,
+    ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle='-|>', mutation_scale=5,
                  linewidth=0.8, color=SLATE, zorder=1, shrinkA=0, shrinkB=0))
 
 
@@ -173,7 +173,7 @@ for ph, (p0, p1) in phases.items():
     ax.add_patch(FancyBboxPatch((PH_X, p0), PH_W, p1 - p0, boxstyle='round,pad=0,rounding_size=3',
                  linewidth=0, facecolor='#fde7eb', zorder=1))
     ax.text(PH_X + PH_W/2, (p0 + p1)/2, ph, rotation=90, ha='center', va='center',
-            fontsize=6.8, weight='bold', color=ROSE)
+            fontsize=7.4, weight='bold', color=ROSE)
 
 save(fig, 'image8', 'png')
 
@@ -247,11 +247,24 @@ LAB = {
     'Hardware':               (20, 0.35, 'left', 'center'),
     'Deep learning':          (-6, 0.40, 'center', 'bottom'),
 }
+ABS = {  # posiciones absolutas de etiqueta (x, y) para evitar cruces
+    'Large language models':  (107, 2.62, 'center', 'bottom'),
+    'Knowledge distillation': (24, 3.97, 'left', 'center'),
+    'Model compression':      (45, 3.62, 'left', 'center'),
+    'Accuracy':               (58, 3.33, 'left', 'center'),
+    'Training':               (60, 2.98, 'left', 'center'),
+    'Adaptation models':      (60, 2.63, 'left', 'center'),
+    'Optimization':           (3, 2.68, 'left', 'center'),
+    'Edge computing':         (0, 3.5, 'center', 'bottom'),
+}
 top = th.nlargest(10, 'Frequency')
+print(top[['Keyword','Centrality','Density']].to_string())
 SHOW = {'Large language models': 'Large language\nmodels', 'Adaptation models': 'Adaptation\nmodels',
         'Edge computing': 'Edge\ncomputing', 'Deep learning': 'Deep\nlearning'}
 for _, r in top.iterrows():
     dx, dy, ha, va = LAB.get(r['Keyword'], (3, 0, 'left', 'center'))
+    if r['Keyword'] in ABS:
+        tx, ty, ha, va = ABS[r['Keyword']]; dx, dy = tx - r['Centrality'], ty - r['Density']
     far = abs(dx) > 3 or abs(dy) > 0.08
     ax.annotate(SHOW.get(r['Keyword'], r['Keyword']), (r['Centrality'], r['Density']),
                 xytext=(r['Centrality'] + dx, r['Density'] + dy), ha=ha, va=va,
