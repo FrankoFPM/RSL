@@ -123,8 +123,7 @@ rows = [  # (phase, main text, side text, main style)
      None, 'highlight'),
 ]
 note = ('9 of the 73 included studies (12%) report a concrete\nedge platform with physical metrics. The remaining 64\n'
-        'use generic descriptors or validate on server GPUs or\nFPGAs outside the edge scope. 33 studies (45%) were coded\n'
-        'from the abstract and indexed metadata.')
+        'use generic descriptors or validate on server GPUs or\nFPGAs outside the edge scope.')
 
 layout, y = [], 0
 for ph, mt, st, style in rows:
