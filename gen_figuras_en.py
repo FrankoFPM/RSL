@@ -89,11 +89,11 @@ save(fig, 'grafico_frecuencia', 'pdf')
 # =================================================================== 2. PRISMA
 # Coordinates are in points (1/72 in) so box sizes follow the text they hold.
 W = COL_W * 72
-FS, FS_SIDE, LS = 8.4, 7.3, 1.08
-GAP, PAD = 7, 4
+FS, FS_SIDE, LS = 8.4, 7.3, 1.03
+GAP, PAD = 4, 3
 PH_X, PH_W = 0, 13                 # phase band
 MX, MW = 17, 106                   # main column
-SX = MX + MW + 8                  # side column
+SX = MX + MW + 5                  # side column
 SW = W - SX
 
 
@@ -119,7 +119,7 @@ rows = [  # (phase, main text, side text, main style)
      'Excluded at full text (n = 7)\nDo not optimize or\nevaluate an LLM',
      'normal'),
     ('INCLUDED',
-     'Studies included\nin the review\n(n = 73)\n2024: 8 | 2025: 28\n2026: 37',
+     'Studies included in\nthe review (n = 73)\n2024: 8 | 2025: 28\n2026: 37',
      None, 'highlight'),
 ]
 note = ('9 of the 73 included studies (12%) report a concrete\nedge platform with physical metrics. The remaining 64\n'
@@ -149,7 +149,7 @@ def box(x, ytop, w, h, text, style='normal', fs=FS):
 
 
 def arrow(x1, y1, x2, y2):
-    ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle='-|>', mutation_scale=5,
+    ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle='-|>', mutation_scale=4,
                  linewidth=0.8, color=SLATE, zorder=1, shrinkA=0, shrinkB=0))
 
 
