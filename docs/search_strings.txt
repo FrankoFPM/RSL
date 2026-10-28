@@ -1,0 +1,41 @@
+SEARCH STRATEGY - RSL LLM optimisation for edge / resource-constrained devices
+==============================================================================
+
+Databases      : Scopus (Elsevier) and Web of Science Core Collection (Clarivate)
+Date limits    : none applied at search time (the 2024-2026 window results from
+                 the screening stages, see docs/protocol.pdf)
+Document type  : no filter at search time; EC-4 applied afterwards in
+                 scripts/prisma_flow.py
+Records        : Scopus = 586, Web of Science = 138, total = 724
+Search fields  : [TO CONFIRM: e.g. Scopus TITLE-ABS-KEY / WoS Topic (TS)]
+Search date    : [TO CONFIRM: YYYY-MM-DD]
+
+Boolean query (identical in both databases, built from the PICOC blocks)
+------------------------------------------------------------------------
+
+("Large language model" OR "LLM*" OR "Foundation model*")
+AND
+("quantization" OR "model compression" OR "low-bit" OR "knowledge distillation" OR "pruning")
+AND
+("edge computing" OR "mobile" OR "resource-constrained" OR "edge device*" OR "FPGA" OR "smartphone")
+
+Block mapping (PICOC)
+---------------------
+Block 1  Population    : large language models / foundation models
+Block 2  Intervention  : algorithmic optimisation and compression techniques
+Block 3  Context       : edge, mobile and resource-constrained hardware
+Comparison and Outcomes were deliberately left out of the string to maximise
+recall and capture every reported physical metric.
+
+Known limitation
+----------------
+Parameter-efficient fine-tuning terms (LoRA, PEFT, low-rank) were not part of
+the string. Low-rank studies were retrieved only when indexed under
+compression or deployment terms (see Threats to Validity in the manuscript).
+
+Raw exports
+-----------
+data/scopus_raw.csv  Scopus CSV export (abstracts, references, funding text
+                     and e-mail addresses removed for copyright/privacy)
+data/wos_raw.csv     Web of Science export in tabular (field-tag) form, same
+                     redactions

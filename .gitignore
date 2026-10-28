@@ -1,7 +1,15 @@
-# Entorno y archivos generados por Python
-.venv/
+# Python
 __pycache__/
 *.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
 
-# Herramientas locales
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local tools
 .antigravitycli/

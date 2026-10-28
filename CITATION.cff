@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you reuse this replication package, please cite it as below."
+title: "Replication package: Optimisation of Large Language Models on Resource-Constrained Devices. A Systematic Literature Review (2024-2026)"
+type: dataset
+authors:
+  - family-names: "Camiloaga Cuenca"
+    given-names: "Johann Gudwig"
+    affiliation: "Universidad Tecnológica del Perú"
+  - family-names: "Perez Melgarejo"
+    given-names: "Franco Johan"
+    affiliation: "Universidad Tecnológica del Perú"
+  - family-names: "Alcántara-Núñez"
+    given-names: "Juan A."
+    affiliation: "Universidad Tecnológica del Perú"
+version: "1.0.0"
+date-released: "2026-10-27"
+repository-code: "https://github.com/FrankoFPM/RSL"
+license: [MIT, CC-BY-4.0]
+keywords:
+  - large language models
+  - edge computing
+  - quantization
+  - model compression
+  - systematic literature review
+  - PRISMA

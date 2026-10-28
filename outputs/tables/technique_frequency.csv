@@ -1,0 +1,5 @@
+family,studies,percent_of_corpus
+Quantization,42,57.5
+Pruning / sparsity,19,26.0
+Low-rank (LoRA/PEFT),15,20.5
+Knowledge distillation,14,19.2

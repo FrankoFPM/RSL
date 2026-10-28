@@ -1,97 +1,217 @@
-# Paquete de replicación — RSL: Optimización de LLMs en dispositivos de recursos limitados
+# Optimisation of LLMs on Resource-Constrained Devices: SLR Replication Package
 
-Materiales de replicación de la revisión sistemática de literatura sobre técnicas de optimización de Modelos de Lenguaje de Gran Escala (LLMs) para despliegue en hardware perimetral (2024–2026).
+[![Code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
+[![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-lightgrey.svg)](LICENSE-DATA)
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 
-**Autores:** Johann Gudwig Camiloaga Cuenca, Franco Johan Perez Melgarejo, Juan A. Alcántara-Núñez
-Universidad Tecnológica del Perú — Ingeniería de Sistemas e Informática
+This repository is the replication package of the systematic literature review
+*"Optimisation of large language models on resource-constrained devices: a
+systematic literature review (2024-2026)"*. The review asks how large language
+models (LLMs) are made to run on edge hardware: which optimisation techniques
+are used, which platforms validate them, how they affect memory, latency,
+energy and accuracy, and which gaps remain. It follows the Kitchenham and
+Charters guidelines, uses PICOC to build the search, and reports the selection
+according to PRISMA 2020.
+
+The search ran on Scopus and Web of Science and retrieved 724 records. After
+de-duplication, eligibility filtering, title/abstract screening and full-text
+assessment, 73 journal articles published between 2024 and 2026 form the
+corpus. Quantisation is the most frequent technique (42 studies), followed by
+pruning/sparsity (19), low-rank adaptation (15) and knowledge distillation
+(14). Only 9 studies (12.3%) name a concrete edge platform and report physical
+metrics measured on it, and none of the low-rank (LoRA/PEFT) studies does so.
+
+Everything needed to audit or extend the review is here: the original database
+exports, every screening decision with its reason, the data extraction matrix
+(Annex A), the quality assessment (Annex B), the protocol and the exact search
+string. Three Python scripts rebuild the PRISMA counts, the descriptive
+statistics and the manuscript figures from those files, and stop with an error
+if any number differs from the one reported in the paper.
+
+**Authors:** Johann Gudwig Camiloaga Cuenca, Franco Johan Perez Melgarejo,
+Juan A. Alcántara-Núñez (corresponding author). Universidad Tecnológica del
+Perú.
 
 ---
 
-## Contenido
+## Repository structure
 
-| Archivo | Descripción |
-|---|---|
-| `ARTICULOS_UNIFICADOS_CRIBADO.xlsx` | Datos primarios: búsqueda cruda, cribado y corpus final |
-| `process_rsl.py` | Genera las figuras bibliométricas |
-| `analisis_auditoria.py` | Genera las tablas cuantitativas y el reporte de consistencia |
-| `anexoA_hardware.py` | Hardware declarado por cada estudio (Anexo A del manuscrito) |
-| `tablas/` | Tablas LaTeX generadas, listas para `\input` |
-| `graficos_sin_titulo/` | Figuras sin título, para insertar en el manuscrito |
-| `graficos_fuente_grande/` | Variantes con tipografía ampliada |
-| `gen_figuras_en.py` | Figuras del manuscrito en inglés, a una columna (FGCS doble columna) -> `figuras_en/` |
-| `codificacion_rq4.csv` | Codificación por estudio (n=80): familia de optimización y clase de plataforma. Fuente única de la Tabla de frecuencias y de la Figura de la RQ4 |
-| `gen_figura_rq4.py` | Matriz técnica x plataforma (RQ4) desde `codificacion_rq4.csv` (`en` por defecto, `es` opcional) |
-| `correccion_keywords_log.csv` | Registro de la corrección de palabras clave (ver nota abajo) |
+```
+.
+├── README.md                  This file
+├── LICENSE                    MIT (code in scripts/)
+├── LICENSE-DATA               CC BY 4.0 (data/, docs/, outputs/)
+├── CITATION.cff               Machine-readable citation (GitHub "Cite this repository")
+├── requirements.txt           Python dependencies
+│
+├── data/                      Raw and processed data (see data/README.md for the dictionary)
+│   ├── scopus_raw.csv             Scopus export, 586 records
+│   ├── wos_raw.csv                Web of Science export, 138 records
+│   ├── screening_title_abstract.csv  149 screened records + decision + reason
+│   ├── fulltext_exclusions.csv    7 records excluded at full text + reason
+│   ├── corpus_73.csv              Data extraction matrix of the 73 studies (Annex A)
+│   ├── quality_assessment.csv     Quality assessment QA1-QA3 (Annex B)
+│   ├── keyword_corrections_log.csv  Audit log of keyword corrections
+│   └── screening_workbook.xlsx    Original working workbook (provenance)
+│
+├── scripts/
+│   ├── common.py                  Shared paths, loaders and cleaning rules
+│   ├── prisma_flow.py             Rebuilds and checks the PRISMA cascade
+│   ├── bibliometrics.py           Corpus statistics, RQ1/RQ2/RQ4 counts, Bradford, Lotka, QA
+│   └── generate_charts.py         Manuscript figures (PRISMA, thematic map, RQ4 matrix)
+│
+├── docs/
+│   ├── protocol.pdf               Review protocol (RQs, PICOC, criteria, QA, extraction)
+│   └── search_strings.txt         Exact Boolean query and record counts per database
+│
+└── outputs/                   Generated by the scripts (committed for convenience)
+    ├── figures/                   PDF (vector) + PNG (600 dpi)
+    └── tables/                    CSV + Markdown
+```
 
-## Nota de corrección (octubre 2026)
+## Requirements
 
-En las hojas `SELECCIONADOS`, `SELECCIONADOS-CRIBADO`, `SELECCIONADOS-FINAL` y `VERIFICAR-ACCESS`, las columnas de palabras clave (`DE`, `ID`) de algunas filas estaban desalineadas respecto del resto del registro (contenían las palabras clave de otro artículo cercano). Autores, título, resumen, revista y citas sí estaban alineados. Las columnas `DE` e `ID` se reconstruyeron por DOI a partir de las exportaciones originales (`ARTICULOS SCOPUS`, `ARTICULOS WoS`). Cada celda modificada consta en `correccion_keywords_log.csv`. El mapa temático se regeneró con los datos corregidos.
+* Python **3.10 or newer**
+* pandas >= 2.0, matplotlib >= 3.7, networkx >= 3.0
 
-## Hojas del libro de datos
+Tested on Python 3.10 (pandas 2.3, matplotlib 3.10, Windows) and Python 3.13
+(pandas 3.0, matplotlib 3.11, Linux). No GPU, internet access or API key is
+needed; the scripts only read the files in `data/`.
 
-| Hoja | Filas | Etapa PRISMA |
-|---|---|---|
-| `ARTICULOS SCOPUS` | 586 | Identificación (Scopus) |
-| `ARTICULOS WoS` | 138 | Identificación (Web of Science) |
-| `SELECCIONADOS` | 149 | Tras depuración y cribado preliminar |
-| `SELECCIONADOS-CRIBADO` | 149 | Cribado con decisión y motivo |
-| `SELECCIONADOS-FINAL` | **80** | **Corpus definitivo del estudio** |
-| `VERIFICAR-ACCESS` | 80 | Seguimiento de acceso a texto completo |
+## How to reproduce the results
 
-> **Importante:** todo análisis debe leer `SELECCIONADOS-FINAL` (n=80). La hoja
-> `SELECCIONADOS` (n=149) es la etapa previa a la aplicación de los criterios
-> de elegibilidad y **no** constituye el corpus del estudio.
-
-## Reproducción
+**1. Get the code**
 
 ```bash
+git clone https://github.com/FrankoFPM/RSL.git
+cd RSL
+```
+
+**2. Create an environment and install the dependencies**
+
+```bash
+python -m venv .venv
+# Linux / macOS
+source .venv/bin/activate
+# Windows (PowerShell)
+.venv\Scripts\Activate.ps1
+
 pip install -r requirements.txt
-
-python process_rsl.py          # figuras  -> ./  y  ./graficos_sin_titulo/
-python analisis_auditoria.py   # tablas   -> ./tablas/
 ```
 
-`analisis_auditoria.py` emite además `tablas/reporte_consistencia.txt`, que
-verifica las cifras del flujo PRISMA contra los datos y resume la cobertura de
-acceso a texto completo.
+**3. Verify the PRISMA selection flow**
 
-## Cifras de referencia
-
-Salida esperada de `analisis_auditoria.py` sobre el corpus de 80 estudios:
-
-```
-Distribución anual        2024: 9  |  2025: 31  |  2026: 40
-Fuentes normalizadas      57 revistas
-Zonas de Bradford         Z1 = 7 rev / 28 art; Z2 = 25 / 27; Z3 = 25 / 25
-Multiplicadores           [3.57, 1.00]  -> la Ley de Bradford no se cumple
-Dispersión                48 de 57 revistas (84%) aportan un solo artículo
-Autores                   398 únicos; 379 con un artículo (95.2%)
-Estudios sin citas        43 de 80 (54%)
-Plataforma Edge concreta  18 de 80 (22%)  |  FPGA = 8, Jetson = 4
-Sin plataforma            57 de 80 (71%)
+```bash
+python scripts/prisma_flow.py
 ```
 
-## Limitaciones declaradas
+Rebuilds every count of the flow diagram from the raw exports
+(724 → 553 → 168 → 163 → 149 → 80 → 73) and writes
+`outputs/tables/prisma_flow.{csv,md}`. Expected last line:
 
-Estas limitaciones se documentan en la sección de Amenazas a la Validez del
-manuscrito y se hacen explícitas aquí para quien reutilice los datos:
+```
+[OK] All PRISMA counts match the manuscript.
+```
 
-- **Cobertura de fuentes.** La búsqueda se ejecutó sobre Scopus y Web of Science.
-  El criterio de exclusión CE-4 restringió el corpus a artículos de revista, lo
-  que dejó fuera las actas de congreso (67% de los registros recuperados en
-  Scopus). En ingeniería de sistemas de aprendizaje automático las conferencias
-  constituyen un canal primario de publicación arbitrada.
-- **Acceso a texto completo.** 36 de los 80 estudios incluidos (45%) fueron
-  codificados a partir de resumen y metadatos indexados.
-- **Extracción de hardware.** 57 estudios (71%) no declaran una plataforma
-  física concreta; el análisis de métricas físicas se restringe a los 18 que sí
-  lo hacen.
-- **Evaluación de calidad.** Se aplicó como instrumento descriptivo, no como
-  filtro de exclusión. Los resultados no están ponderados por calidad.
-- **Fiabilidad inter-evaluador.** No se calculó coeficiente de concordancia
-  entre evaluadores para las decisiones de cribado y extracción.
+**4. Compute the corpus statistics**
 
-## Licencia
+```bash
+python scripts/bibliometrics.py
+```
 
-Los datos y el código se distribuyen bajo licencia MIT. Los artículos
-referenciados permanecen sujetos a los derechos de sus respectivos editores.
+Writes the tables behind the descriptive characterisation and RQ1, RQ2 and
+RQ4 to `outputs/tables/`: technique frequencies, platform distribution,
+technique x platform matrix, journals, Bradford zones, Lotka distribution and
+quality-assessment summary. Expected last line:
+
+```
+[OK] All corpus statistics match the manuscript.
+```
+
+**5. Generate the figures**
+
+```bash
+python scripts/generate_charts.py
+```
+
+| Output (`outputs/figures/`) | Manuscript |
+|---|---|
+| `fig1_prisma_flow.pdf` | Figure 1. PRISMA 2020 flow diagram |
+| `fig2_thematic_map.pdf` | Figure 2. Strategic thematic map of author keywords |
+| `fig3_rq4_matrix.pdf` | Figure 3. Optimisation family x hardware platform (RQ4) |
+| `figS1_technique_frequency.pdf` | Supplementary. Studies per optimisation family (RQ1) |
+| `thematic_map_data.csv` | Centrality and density values behind Figure 2 |
+
+The three steps are independent and each takes a few seconds. Run them from
+the repository root as shown; the scripts resolve paths relative to their own
+location, so they also work from any other directory.
+
+## Reference values
+
+The scripts check these values against the data and fail if any differs:
+
+| Indicator | Value |
+|---|---|
+| Records identified | 724 (Scopus 586, WoS 138) |
+| Duplicates / non-primary type / language / secondary or incomplete | 171 / 385 / 5 / 14 |
+| Screened by title and abstract | 149 (69 excluded) |
+| Assessed at full text | 80 (7 excluded) |
+| Included studies | 73 (2024: 8, 2025: 28, 2026: 37) |
+| Quantisation / pruning / low-rank / distillation | 42 / 19 / 15 / 14 |
+| Group A (edge platform + physical metrics) | 9 (Jetson 5, ARM SoC / RPi 4) |
+| No edge platform identified | 53 (72.6%) |
+| Distinct journals | 54 (47 with a single article) |
+| Unique authors | 371 (355 with a single article) |
+| Studies with zero citations | 40 (55%) |
+| QA1 = 1.0 / 0.5 / 0.0 | 17 / 54 / 2 |
+
+## Declared limitations
+
+* **Sources.** Only Scopus and Web of Science were available. Criterion EC-4
+  removed conference proceedings, an important publication channel in
+  machine-learning systems.
+* **Search string.** Parameter-efficient fine-tuning terms (LoRA, PEFT) were
+  not included; low-rank studies were retrieved only when indexed under
+  compression or deployment terms.
+* **Hardware reporting.** 53 of 73 studies use generic descriptors such as
+  "edge devices" instead of naming a platform, so physical-metric analysis is
+  restricted to the 9 Group A studies.
+* **Quality assessment** is descriptive and does not weight the synthesis.
+* **Language.** Free-text reasons, screening notes and the `main_result_es`
+  column are in Spanish, the working language of the review team.
+
+## How to cite
+
+If you reuse this package, please cite the article and the replication
+package. GitHub's **"Cite this repository"** button reads `CITATION.cff`.
+
+```bibtex
+@misc{CamiloagaPerezAlcantara2026RSLpackage,
+  author       = {Camiloaga Cuenca, Johann Gudwig and Perez Melgarejo, Franco Johan
+                  and Alc{\'a}ntara-N{\'u}{\~n}ez, Juan A.},
+  title        = {Replication package: Optimisation of Large Language Models on
+                  Resource-Constrained Devices. A Systematic Literature Review (2024--2026)},
+  year         = {2026},
+  version      = {1.0.0},
+  howpublished = {\url{https://github.com/FrankoFPM/RSL}},
+  note         = {Code: MIT License. Data: CC BY 4.0}
+}
+```
+
+> The citation of the article itself will be added here once it is published.
+
+## License
+
+* Code (`scripts/`): [MIT License](LICENSE).
+* Data, documentation and generated outputs (`data/`, `docs/`, `outputs/`):
+  [Creative Commons Attribution 4.0 International](LICENSE-DATA).
+
+Bibliographic metadata were exported from Scopus and Web of Science; abstracts,
+cited references, funding texts and e-mail addresses were removed before
+publication. The reviewed articles remain the property of their publishers.
+
+## Contact
+
+Juan A. Alcántara-Núñez (corresponding author), Universidad Tecnológica del
+Perú. Questions about the data or scripts can also be opened as
+[GitHub issues](https://github.com/FrankoFPM/RSL/issues).

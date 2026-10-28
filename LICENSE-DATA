@@ -1,0 +1,24 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Copyright (c) 2026 Johann Gudwig Camiloaga Cuenca, Franco Johan Perez Melgarejo,
+Juan A. Alcántara-Núñez
+
+The contents of the data/, docs/ and outputs/ directories of this repository
+(datasets, extraction matrix, quality assessment, protocol, figures and
+tables) are licensed under the Creative Commons Attribution 4.0 International
+License. You are free to share and adapt this material for any purpose, even
+commercially, provided that you give appropriate credit (see the "How to
+cite" section of README.md), provide a link to the license, and indicate if
+changes were made.
+
+Full legal code: https://creativecommons.org/licenses/by/4.0/legalcode
+Summary:         https://creativecommons.org/licenses/by/4.0/
+
+Bibliographic metadata of the reviewed studies (titles, authors, keywords,
+affiliations) were exported from Scopus and Web of Science and remain subject
+to the terms of those providers. Abstracts, cited references, funding texts
+and e-mail addresses were removed before publication. The reviewed articles
+themselves remain the property of their respective publishers.
+
+The source code in scripts/ is licensed separately under the MIT License
+(see LICENSE).
