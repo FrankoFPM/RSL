@@ -1,13 +1,13 @@
-# Optimisation of LLMs on Resource-Constrained Devices: SLR Replication Package
+# The Edge Deployment Gap: SLR Replication Package
 
 [![Code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-lightgrey.svg)](LICENSE-DATA)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 
 This repository is the replication package of the systematic literature review
-*"Optimisation of large language models on resource-constrained devices: a
-systematic literature review (2024-2026)"*. The review asks how large language
-models (LLMs) are made to run on edge hardware: which optimisation techniques
+*"The Edge Deployment Gap: A Systematic Review of Large Language Model
+Optimization for Resource-Constrained Devices (2024-2026)"*. The review asks how large language
+models (LLMs) are made to run on edge hardware: which optimization techniques
 are used, which platforms validate them, how they affect memory, latency,
 energy and accuracy, and which gaps remain. It follows the Kitchenham and
 Charters guidelines, uses PICOC to build the search, and reports the selection
@@ -16,7 +16,7 @@ according to PRISMA 2020.
 The search ran on Scopus and Web of Science and retrieved 724 records. After
 de-duplication, eligibility filtering, title/abstract screening and full-text
 assessment, 73 journal articles published between 2024 and 2026 form the
-corpus. Quantisation is the most frequent technique (42 studies), followed by
+corpus. Quantization is the most frequent technique (42 studies), followed by
 pruning/sparsity (19), low-rank adaptation (15) and knowledge distillation
 (14). Only 9 studies (12.3%) name a concrete edge platform and report physical
 metrics measured on it, and none of the low-rank (LoRA/PEFT) studies does so.
@@ -119,7 +119,7 @@ Rebuilds every count of the flow diagram from the raw exports
 python scripts/bibliometrics.py
 ```
 
-Writes the tables behind the descriptive characterisation and RQ1, RQ2 and
+Writes the tables behind the descriptive characterization and RQ1, RQ2 and
 RQ4 to `outputs/tables/`: technique frequencies, platform distribution,
 technique x platform matrix, journals, Bradford zones, Lotka distribution and
 quality-assessment summary. Expected last line:
@@ -138,8 +138,8 @@ python scripts/generate_charts.py
 |---|---|
 | `fig1_prisma_flow.pdf` | Figure 1. PRISMA 2020 flow diagram |
 | `fig2_thematic_map.pdf` | Figure 2. Strategic thematic map of author keywords |
-| `fig3_rq4_matrix.pdf` | Figure 3. Optimisation family x hardware platform (RQ4) |
-| `figS1_technique_frequency.pdf` | Supplementary. Studies per optimisation family (RQ1) |
+| `fig3_rq4_matrix.pdf` | Figure 3. Optimization family x hardware platform (RQ4) |
+| `figS1_technique_frequency.pdf` | Supplementary. Studies per optimization family (RQ1) |
 | `thematic_map_data.csv` | Centrality and density values behind Figure 2 |
 
 The three steps are independent and each takes a few seconds. Run them from
@@ -157,7 +157,7 @@ The scripts check these values against the data and fail if any differs:
 | Screened by title and abstract | 149 (69 excluded) |
 | Assessed at full text | 80 (7 excluded) |
 | Included studies | 73 (2024: 8, 2025: 28, 2026: 37) |
-| Quantisation / pruning / low-rank / distillation | 42 / 19 / 15 / 14 |
+| Quantization / pruning / low-rank / distillation | 42 / 19 / 15 / 14 |
 | Group A (edge platform + physical metrics) | 9 (Jetson 5, ARM SoC / RPi 4) |
 | No edge platform identified | 53 (72.6%) |
 | Distinct journals | 54 (47 with a single article) |
@@ -189,8 +189,8 @@ package. GitHub's **"Cite this repository"** button reads `CITATION.cff`.
 @misc{CamiloagaPerezAlcantara2026RSLpackage,
   author       = {Camiloaga Cuenca, Johann Gudwig and Perez Melgarejo, Franco Johan
                   and Alc{\'a}ntara-N{\'u}{\~n}ez, Juan A.},
-  title        = {Replication package: Optimisation of Large Language Models on
-                  Resource-Constrained Devices. A Systematic Literature Review (2024--2026)},
+  title        = {Replication package: The Edge Deployment Gap. A Systematic Review of
+                  Large Language Model Optimization for Resource-Constrained Devices (2024--2026)},
   year         = {2026},
   version      = {1.0.0},
   howpublished = {\url{https://github.com/FrankoFPM/RSL}},

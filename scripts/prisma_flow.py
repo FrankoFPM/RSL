@@ -11,7 +11,7 @@ database exports in ``data/`` and checks it against the published figures:
     - 69 excluded on title and abstract                    ->  80 full text
     -  7 excluded at full text (do not evaluate an LLM)    ->  73 included
 
-Note on duplicates: de-duplication uses the normalised title. Under that rule
+Note on duplicates: de-duplication uses the normalized title. Under that rule
 126 removed records overlap across databases and 45 are internal Scopus
 redundancies (171 in total). Matching on DOI instead finds 127 WoS records in
 Scopus, which is where an earlier 127/44 split came from; the total of 171 and
@@ -61,7 +61,7 @@ def compute() -> dict:
          "scopus": sum(r["db"] == "SCOPUS" for r in recs),
          "wos": sum(r["db"] == "WOS" for r in recs)}
 
-    # 1) De-duplication by normalised title. WoS metadata are kept when a record
+    # 1) De-duplication by normalized title. WoS metadata are kept when a record
     #    appears in both databases (richer indexed fields, e.g. cited references).
     unique = {}
     for r in sorted(recs, key=lambda r: 0 if r["db"] == "WOS" else 1):

@@ -1,17 +1,17 @@
 """Descriptive statistics of the 73-study corpus (RQ1, RQ2, RQ4 counts,
 Bradford, Lotka and quality-assessment summaries).
 
-Every number quoted in the "Descriptive characterisation of the corpus" and in
+Every number quoted in the "Descriptive characterization of the corpus" and in
 the RQ1/RQ2/RQ4 tables of the manuscript is recomputed here from
 ``data/corpus_73.csv`` and ``data/quality_assessment.csv``.
 
 Outputs (outputs/tables/, each as .csv and .md):
     corpus_summary              headline indicators
     annual_distribution         studies per publication year
-    technique_frequency         RQ1: studies per optimisation family
+    technique_frequency         RQ1: studies per optimization family
     platform_distribution       RQ2: studies per validation platform class
     technique_platform_matrix   RQ4: family x platform cross-tabulation
-    journals                    studies per (normalised) journal
+    journals                    studies per (normalized) journal
     bradford_zones              Bradford zones and multipliers
     lotka                       author productivity vs. Lotka's law
     quality_summary             QA1-QA3 score distribution
@@ -20,6 +20,7 @@ Usage: python scripts/bibliometrics.py
 """
 from __future__ import annotations
 
+import math
 from collections import Counter
 
 import pandas as pd
@@ -37,9 +38,13 @@ EXPECTED = {
 }
 
 
-def lotka_expected(k: int, kmax: int = 20) -> float:
-    """Share (%) of authors with k papers under Lotka's inverse-square law."""
-    return (1 / k ** 2) / sum(1 / i ** 2 for i in range(1, kmax + 1)) * 100
+def lotka_expected(k: int) -> float:
+    """Share (%) of authors with k papers under Lotka's inverse-square law.
+
+    Normalized with the full series, 1/zeta(2) = 6/pi^2, as stated in the
+    manuscript (Appendix D): 60.8% for k = 1, 15.2% for k = 2, and so on.
+    """
+    return 6 / math.pi ** 2 / k ** 2 * 100
 
 
 def bradford_zones(counts, n_articles: int):
@@ -65,7 +70,7 @@ def main() -> None:
     years = df["year"].value_counts().sort_index()
     write_table(pd.DataFrame({"year": years.index, "studies": years.values}), "annual_distribution")
 
-    # ---- RQ1: optimisation families (a study can use more than one)
+    # ---- RQ1: optimization families (a study can use more than one)
     fam = pd.DataFrame([{"family": label, "studies": int(df[col].sum()),
                          "percent_of_corpus": round(df[col].sum() / n * 100, 1)}
                         for col, label in FAMILIES.items()])

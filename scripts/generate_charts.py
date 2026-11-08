@@ -6,8 +6,8 @@ font sizes set here are the sizes that appear in the PDF.
 Outputs (outputs/figures/, vector PDF + 600-dpi PNG):
     fig1_prisma_flow           PRISMA 2020 flow diagram (counts from prisma_flow.py)
     fig2_thematic_map          Strategic thematic map of author keywords
-    fig3_rq4_matrix            RQ4: optimisation family x hardware platform
-    figS1_technique_frequency  RQ1: studies per optimisation family (supplementary)
+    fig3_rq4_matrix            RQ4: optimization family x hardware platform
+    figS1_technique_frequency  RQ1: studies per optimization family (supplementary)
     + thematic_map_data.csv    centrality/density values behind fig2
 
 Usage: python scripts/generate_charts.py
@@ -245,7 +245,7 @@ def thematic_map() -> None:
 
 # =========================================================================== Fig. 3
 def rq4_matrix() -> None:
-    """Bubble matrix: optimisation family (x) vs. declared hardware platform (y)."""
+    """Bubble matrix: optimization family (x) vs. declared hardware platform (y)."""
     df = load_corpus()
     labels_x = ["Quanti-\nzation", "Pruning /\nsparsity", "Low-rank\n(LoRA/PEFT)", "Distil-\nlation"]
     labels_y = ["Jetson", "ARM SoC / RPi", "Server FPGA", "Desktop/server GPU", "No edge platform"]
@@ -279,7 +279,7 @@ def rq4_matrix() -> None:
 
 # =========================================================================== Fig. S1
 def technique_frequency() -> None:
-    """Horizontal bars: number of studies per optimisation family (RQ1)."""
+    """Horizontal bars: number of studies per optimization family (RQ1)."""
     df = load_corpus()
     n = len(df)
     order = ["low_rank_peft", "distillation", "pruning_sparsity", "quantization"]  # bottom -> top

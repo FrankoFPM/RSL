@@ -1,4 +1,4 @@
-SEARCH STRATEGY - RSL LLM optimisation for edge / resource-constrained devices
+SEARCH STRATEGY - RSL LLM optimization for edge / resource-constrained devices
 ==============================================================================
 
 Databases      : Scopus (Elsevier) and Web of Science Core Collection (Clarivate)
@@ -22,9 +22,9 @@ AND
 Block mapping (PICOC)
 ---------------------
 Block 1  Population    : large language models / foundation models
-Block 2  Intervention  : algorithmic optimisation and compression techniques
+Block 2  Intervention  : algorithmic optimization and compression techniques
 Block 3  Context       : edge, mobile and resource-constrained hardware
-Comparison and Outcomes were deliberately left out of the string to maximise
+Comparison and Outcomes were deliberately left out of the string to maximize
 recall and capture every reported physical metric.
 
 Known limitation

@@ -1,4 +1,4 @@
-"""Shared paths, loaders and text-normalisation helpers.
+"""Shared paths, loaders and text-normalization helpers.
 
 Every analysis script imports from this module so that all figures and tables
 are computed from the same files in ``data/`` with the same cleaning rules.
@@ -17,7 +17,7 @@ DATA = ROOT / "data"
 FIGURES = ROOT / "outputs" / "figures"
 TABLES = ROOT / "outputs" / "tables"
 
-# Optimisation families coded per study in corpus_73.csv (0/1 flags).
+# Optimization families coded per study in corpus_73.csv (0/1 flags).
 FAMILIES = {
     "quantization": "Quantization",
     "pruning_sparsity": "Pruning / sparsity",
@@ -28,7 +28,7 @@ FAMILIES = {
 # Platform classes, ordered from edge to non-edge. Group A = the first two.
 PLATFORMS = [
     "NVIDIA Jetson",
-    "ARM SoC / Raspberry Pi / NPU",
+    "ARM SoC / Raspberry Pi / FPGA SoC",
     "Server FPGA",
     "Desktop/server GPU",
     "No edge platform",

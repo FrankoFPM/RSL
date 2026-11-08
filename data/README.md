@@ -33,7 +33,7 @@ keywords, `ID` = index keywords, `C1` = affiliations, `RP` = reprint address,
 ## `fulltext_exclusions.csv`
 
 Same columns as above, plus `FT_EXCLUSION_REASON_ES` (Spanish): why the study
-was excluded after full-text reading. All seven do not optimise or evaluate an
+was excluded after full-text reading. All seven do not optimize or evaluate an
 LLM.
 
 ## `corpus_73.csv` (Annex A)
@@ -48,11 +48,11 @@ LLM.
 | `author_keywords`, `index_keywords` | text, `;`-separated | Used for the thematic map. |
 | `affiliations`, `wos_categories` | text | As exported. |
 | `open_access` | `yes` / `no` | Whether the full text is freely available. |
-| `technique` | text | Optimisation technique(s) as declared by the study. |
+| `technique` | text | Optimization technique(s) as declared by the study. |
 | `hardware` | text | Hardware exactly as declared by the study (not completed with assumptions). |
-| `platform_class` | category | `NVIDIA Jetson`, `ARM SoC / Raspberry Pi / NPU`, `Server FPGA`, `Desktop/server GPU`, `No edge platform`. One class per study. |
+| `platform_class` | category | `NVIDIA Jetson`, `ARM SoC / Raspberry Pi / FPGA SoC`, `Server FPGA`, `Desktop/server GPU`, `No edge platform`. One class per study. |
 | `edge_group_a` | 0/1 | 1 = concrete edge platform with physical metrics measured on it (Group A, n = 9). |
-| `quantization`, `pruning_sparsity`, `low_rank_peft`, `distillation` | 0/1 | Optimisation families (non-exclusive). |
+| `quantization`, `pruning_sparsity`, `low_rank_peft`, `distillation` | 0/1 | Optimization families (non-exclusive). |
 | `main_result_es` | text (Spanish) | Main quantitative result, as reported in Annex A of the supplementary material. |
 | `inclusion_rationale_es` | text (Spanish) | Reviewer's inclusion justification at screening. |
 
@@ -65,7 +65,7 @@ re-sort the file if you want to reproduce Figure 2 exactly.
 | Column | Values | Question |
 |---|---|---|
 | `QA1_hardware` | 1.0 / 0.5 / 0.0 | Does the study explicitly specify the hardware and physical deployment environment? 1.0 = concrete device named; 0.5 = generic descriptor only; 0.0 = not declared. |
-| `QA2_method` | 1.0 / 0.5 / 0.0 | Is the optimisation method reproducible? |
+| `QA2_method` | 1.0 / 0.5 / 0.0 | Is the optimization method reproducible? |
 | `QA3_metrics` | 1.0 / 0.5 / 0.0 | Are quantitative metrics compared against established reference models? |
 | `total_score` | 0-3 | Sum of the three scores. |
 
