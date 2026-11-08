@@ -7,8 +7,8 @@ Date limits    : none applied at search time (the 2024-2026 window results from
 Document type  : no filter at search time; EC-4 applied afterwards in
                  scripts/prisma_flow.py
 Records        : Scopus = 586, Web of Science = 138, total = 724
-Search fields  : [TO CONFIRM: e.g. Scopus TITLE-ABS-KEY / WoS Topic (TS)]
-Search date    : [TO CONFIRM: YYYY-MM-DD]
+Search fields  : not recorded in the database exports
+Search date    : WoS export 2026-05-25 (field DA); Scopus export date not recorded
 
 Boolean query (identical in both databases, built from the PICOC blocks)
 ------------------------------------------------------------------------
