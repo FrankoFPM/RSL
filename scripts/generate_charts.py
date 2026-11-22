@@ -101,10 +101,11 @@ def prisma_figure() -> None:
          + " | ".join(f"{y}: n = {v}" for y, v in list(yr.items())[2:]),
          None),
     ]
-    note = (f"{group_a} of the {c['included']} included studies ({group_a / c['included'] * 100:.0f}%) "
-            "report a concrete edge platform\nwith physical metrics. The remaining "
-            f"{c['included'] - group_a} use generic descriptors or\n"
-            "validate on server GPUs or FPGAs outside the edge scope.")
+    note = (f"{group_a} of the {c['included']} included studies ({group_a / c['included'] * 100:.1f}%) "
+            "report qualifying physical\nmeasurements on identifiable edge platforms (Group A). "
+            f"The remaining\n{c['included'] - group_a} lack qualifying edge validation "
+            "(generic descriptors, no hardware\nreported, non-edge platforms, or non-qualifying measurements).")
+    FS_N = 6.0
 
     HEAD = 16
     y = HEAD + GAP
@@ -115,7 +116,7 @@ def prisma_figure() -> None:
         rh = max(hm, hs)
         lay.append((ph, mt, st, y, rh, hm, hs))
         y += rh + GAP
-    hn = h_of(note, FS_S)
+    hn = h_of(note, FS_N)
     H = y + hn + 1
 
     fig = plt.figure(figsize=(COL_W, H / 72))
@@ -146,7 +147,7 @@ def prisma_figure() -> None:
         prev = ym + hm
         p0, p1 = phases.get(ph, (yt, yt + rh))
         phases[ph] = (min(p0, yt), max(p1, yt + rh))
-    box(MX, y, W - MX - 0.5, hn, note, fs=FS_S)
+    box(MX, y, W - MX - 0.5, hn, note, fs=FS_N)
     for ph, (p0, p1) in phases.items():
         ax.add_patch(FancyBboxPatch((PH_X, p0), PH_W, p1 - p0, boxstyle="round,pad=0,rounding_size=3",
                                     linewidth=0.6, edgecolor=BLUE_E, facecolor=BLUE, zorder=1))
@@ -248,10 +249,19 @@ def rq4_matrix() -> None:
     """Bubble matrix: optimization family (x) vs. declared hardware platform (y)."""
     df = load_corpus()
     labels_x = ["Quanti-\nzation", "Pruning /\nsparsity", "Low-rank\n(LoRA/PEFT)", "Distil-\nlation"]
-    labels_y = ["Jetson", "ARM SoC / RPi", "Server FPGA", "Desktop/server GPU", "No edge platform"]
+    labels_y = [
+        "NVIDIA Jetson (n=5)",
+        "ARM SoC / SBC (n=3)",
+        "FPGA SoC ZCU102 (n=1)",
+        "Server FPGA (n=2)",
+        "Desktop/server GPU/SoC (n=4)",
+        "Edge/FPGA, non-qual. (n=2)",
+        "Generic descriptors (n=54)",
+        "No hardware reported (n=2)",
+    ]
     M = df.groupby("platform_class")[list(FAMILIES)].sum().reindex(PLATFORMS, fill_value=0)
 
-    fig, ax = plt.subplots(figsize=(4.0, 2.9))
+    fig, ax = plt.subplots(figsize=(4.4, 3.85))
     nP = len(PLATFORMS)
     for xi, fam in enumerate(FAMILIES):
         for pi, plat in enumerate(PLATFORMS):
@@ -259,16 +269,19 @@ def rq4_matrix() -> None:
             if not v:
                 continue
             yy = nP - 1 - pi
-            ax.scatter(xi, yy, s=60 + v * 32, color=NAVY if plat in EDGE_PLATFORMS else SLATE,
+            ax.scatter(xi, yy, s=55 + v * 21, color=NAVY if plat in EDGE_PLATFORMS else SLATE,
                        edgecolors="white", linewidths=0.6, zorder=3)
             ax.text(xi, yy, str(v), ha="center", va="center", fontsize=7.3, weight="bold",
                     color="white", zorder=4)
-    ax.axhline(nP - 2.5, color=ROSE, ls="--", lw=0.8)  # separates edge (Group A) rows
-    ax.text(len(FAMILIES) - 0.45, nP - 2.45, "Edge (Group A) ↑", ha="right", va="bottom",
+    ax.axhline(nP - 3.5, color=ROSE, ls="--", lw=0.8)  # separates edge (Group A) rows
+    ax.text(len(FAMILIES) - 0.45, nP - 3.42, "Edge (Group A, n = 9) ↑", ha="right", va="bottom",
             fontsize=6.6, style="italic", color=ROSE)
+    ax.axhline(nP - 6.5, color="#64748b", ls=":", lw=0.75)  # separates QA1 = 1.0 rows
+    ax.text(len(FAMILIES) - 0.45, nP - 6.42, "QA1 = 1.0 (n = 17) ↑", ha="right", va="bottom",
+            fontsize=6.2, style="italic", color="#64748b")
     ax.set_xticks(range(len(FAMILIES))); ax.set_xticklabels(labels_x, fontsize=7.2, color=INK)
-    ax.set_yticks(range(nP)); ax.set_yticklabels(labels_y[::-1], fontsize=7.2, color=INK)
-    ax.set_xlim(-0.55, len(FAMILIES) - 0.45); ax.set_ylim(-0.6, nP - 0.4)
+    ax.set_yticks(range(nP)); ax.set_yticklabels(labels_y[::-1], fontsize=7.0, color=INK)
+    ax.set_xlim(-0.55, len(FAMILIES) - 0.45); ax.set_ylim(-0.65, nP - 0.35)
     ax.set_xlabel(""); ax.grid(True, ls="--", alpha=0.35, color=GRID, zorder=0)
     ax.tick_params(length=0)
     for s in ax.spines.values():
