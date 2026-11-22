@@ -25,15 +25,19 @@ FAMILIES = {
     "distillation": "Knowledge distillation",
 }
 
-# Platform classes, ordered from edge to non-edge. Group A = the first two.
+# Platform classes, ordered from edge (Group A) to QA1 = 1.0 to QA1 <= 0.5.
 PLATFORMS = [
     "NVIDIA Jetson",
-    "ARM SoC / Raspberry Pi / FPGA SoC",
-    "Server FPGA",
-    "Desktop/server GPU",
-    "No edge platform",
+    "ARM SoC / Raspberry Pi",
+    "FPGA SoC (ZCU102)",
+    "Data-center / server FPGA",
+    "Desktop / server GPU or SoC",
+    "Edge / FPGA (non-qualifying)",
+    "Generic hardware descriptors",
+    "No hardware reported",
 ]
-EDGE_PLATFORMS = set(PLATFORMS[:2])
+EDGE_PLATFORMS = set(PLATFORMS[:3])
+QA1_FULL_PLATFORMS = set(PLATFORMS[:6])
 
 
 def ensure_output_dirs() -> None:
@@ -83,6 +87,9 @@ def norm_title(s) -> str:
 
 _JOURNAL_ABBR = [
     (r"^IEEE TRANS\.? ", "IEEE TRANSACTIONS ON "),
+    (r"\bCOMPUT\.?[\s-]+AIDED DES\.? INTEGR\.? CIRCUITS SYST\.?$",
+     "COMPUTER-AIDED DESIGN OF INTEGRATED CIRCUITS AND SYSTEMS"),
+    (r"\bEVOL\.? COMPUT\.?$", "EVOLUTIONARY COMPUTATION"),
     (r"\bMOB\.? COMPUT\.?$", "MOBILE COMPUTING"),
     (r"\bCONSUM\.? ELECTRON\.?$", "CONSUMER ELECTRONICS"),
     (r"\bCIRCUITS SYST\.? VIDEO TECHNOL\.?$", "CIRCUITS AND SYSTEMS FOR VIDEO TECHNOLOGY"),
@@ -90,6 +97,9 @@ _JOURNAL_ABBR = [
     (r"\bINTELL\.? TRANSP\.? SYST\.?$", "INTELLIGENT TRANSPORTATION SYSTEMS"),
     (r"\bAUTON\.? INTELL\.? SYST\.?\b", "AUTONOMOUS INTELLIGENT SYSTEMS"),
     (r"\bNAT\.? COMMUN\.?\b", "NATURE COMMUNICATIONS"),
+    (r"^ADV\.? TRANSDISCIPL\.? ENG\.?$", "ADVANCES IN TRANSDISCIPLINARY ENGINEERING"),
+    (r"^ICIC EXPRESS LETT\.?$", "ICIC EXPRESS LETTERS"),
+    (r"^INT\.? J\.? INFORM\.? VIS\.?$", "INTERNATIONAL JOURNAL ON INFORMATICS VISUALIZATION"),
     (r"\bCOMPUT\.?\b", "COMPUTING"),
     (r"\bSYST\.?\b", "SYSTEMS"),
     (r"\bAPPL\.?\b", "APPLICATIONS"),
