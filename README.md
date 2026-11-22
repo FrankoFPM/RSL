@@ -1,5 +1,6 @@
 # The Edge Deployment Gap: SLR Replication Package
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24444005.svg)](https://doi.org/10.5281/zenodo.24444005)
 [![Code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-lightgrey.svg)](LICENSE-DATA)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
