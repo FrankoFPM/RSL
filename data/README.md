@@ -50,7 +50,7 @@ LLM.
 | `open_access` | `yes` / `no` | Whether the full text is freely available. |
 | `technique` | text | Optimization technique(s) as declared by the study. |
 | `hardware` | text | Hardware exactly as declared by the study (not completed with assumptions). |
-| `platform_class` | category | `NVIDIA Jetson`, `ARM SoC / Raspberry Pi / FPGA SoC`, `Server FPGA`, `Desktop/server GPU`, `No edge platform`. One class per study. |
+| `platform_class` | category | Aligned 1:1 with QA1 (8 classes, one per study). Group A (n = 9, QA1 = 1.0): `NVIDIA Jetson` (5), `ARM SoC / Raspberry Pi` (3), `FPGA SoC (ZCU102)` (1). Other QA1 = 1.0 (n = 8): `Data-center / server FPGA` (2), `Desktop / server GPU or SoC` (4), `Edge / FPGA (non-qualifying)` (2). QA1 <= 0.5 (n = 56): `Generic hardware descriptors` (54, QA1 = 0.5), `No hardware reported` (2, QA1 = 0.0). |
 | `edge_group_a` | 0/1 | 1 = concrete edge platform with physical metrics measured on it (Group A, n = 9). |
 | `quantization`, `pruning_sparsity`, `low_rank_peft`, `distillation` | 0/1 | Optimization families (non-exclusive). |
 | `main_result_es` | text (Spanish) | Main quantitative result, as reported in Annex A of the supplementary material. |

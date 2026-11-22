@@ -156,11 +156,12 @@ The scripts check these values against the data and fail if any differs:
 | Duplicates / non-primary type / language / secondary or incomplete | 171 / 385 / 5 / 14 |
 | Screened by title and abstract | 149 (69 excluded) |
 | Assessed at full text | 80 (7 excluded) |
-| Included studies | 73 (2024: 8, 2025: 28, 2026: 37) |
+| Included studies | 73 (2024: 8, 2025: 27, 2026: 38) |
 | Quantization / pruning / low-rank / distillation | 42 / 19 / 15 / 14 |
-| Group A (edge platform + physical metrics) | 9 (Jetson 5, ARM SoC / RPi 4) |
-| No edge platform identified | 53 (72.6%) |
-| Distinct journals | 54 (47 with a single article) |
+| Group A (edge platform + physical metrics) | 9 (NVIDIA Jetson 5, ARM SoC / Raspberry Pi 3, FPGA SoC 1) |
+| No specific platform identified (QA1 <= 0.5) | 56 (76.7%) |
+| Distinct journals | 53 (45 with a single article; 85% of journals, 62% of corpus) |
+| Bradford zones (journals/articles) | Z1: 7/26, Z2: 24/25, Z3: 22/22 (multipliers 3.43, 0.92) |
 | Unique authors | 371 (355 with a single article) |
 | Studies with zero citations | 40 (55%) |
 | QA1 = 1.0 / 0.5 / 0.0 | 17 / 54 / 2 |
@@ -173,9 +174,11 @@ The scripts check these values against the data and fail if any differs:
 * **Search string.** Parameter-efficient fine-tuning terms (LoRA, PEFT) were
   not included; low-rank studies were retrieved only when indexed under
   compression or deployment terms.
-* **Hardware reporting.** 53 of 73 studies use generic descriptors such as
-  "edge devices" instead of naming a platform, so physical-metric analysis is
-  restricted to the 9 Group A studies.
+* **Hardware reporting.** 56 of 73 studies (76.7%, QA1 <= 0.5) do not identify
+  a specific hardware platform (54 use generic descriptors such as "edge
+  devices" and 2 report no hardware), and 8 of the 17 studies with QA1 = 1.0
+  validate on non-edge platforms or without qualifying edge measurements; thus
+  physical-metric analysis is restricted to the 9 Group A studies (12.3%).
 * **Quality assessment** is descriptive and does not weight the synthesis.
 * **Language.** Free-text reasons, screening notes and the `main_result_es`
   column are in Spanish, the working language of the review team.
