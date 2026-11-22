@@ -25,16 +25,17 @@ from collections import Counter
 
 import pandas as pd
 
-from common import (FAMILIES, PLATFORMS, load_corpus, load_quality, normalize_journal,
-                    write_table)
+from common import (EDGE_PLATFORMS, FAMILIES, PLATFORMS, load_corpus, load_quality,
+                    normalize_journal, write_table)
 
 # Headline figures reported in the manuscript; the script fails if they drift.
 EXPECTED = {
-    "studies": 73, "journals": 54, "single_article_journals": 47,
+    "studies": 73, "journals": 53, "single_article_journals": 45,
     "unique_authors": 371, "single_article_authors": 355, "uncited_studies": 40,
-    "edge_group_a": 9, "no_edge_platform": 53,
+    "edge_group_a": 9, "no_specific_platform": 56,
     "quantization": 42, "pruning_sparsity": 19, "low_rank_peft": 15, "distillation": 14,
     "qa1_full": 17, "qa1_partial": 54, "qa1_none": 2,
+    "y2024": 8, "y2025": 27, "y2026": 38,
 }
 
 
@@ -69,6 +70,8 @@ def main() -> None:
     # ---- publication years
     years = df["year"].value_counts().sort_index()
     write_table(pd.DataFrame({"year": years.index, "studies": years.values}), "annual_distribution")
+    for y in (2024, 2025, 2026):
+        got[f"y{y}"] = int(years.get(y, 0))
 
     # ---- RQ1: optimization families (a study can use more than one)
     fam = pd.DataFrame([{"family": label, "studies": int(df[col].sum()),
@@ -81,10 +84,10 @@ def main() -> None:
     plat = df["platform_class"].value_counts().reindex(PLATFORMS, fill_value=0)
     pdist = pd.DataFrame({"platform_class": plat.index, "studies": plat.values,
                           "percent_of_corpus": (plat.values / n * 100).round(1),
-                          "edge_group_a": [p in PLATFORMS[:2] for p in plat.index]})
+                          "edge_group_a": [p in EDGE_PLATFORMS for p in plat.index]})
     write_table(pdist, "platform_distribution")
     got["edge_group_a"] = int(df["edge_group_a"].sum())
-    got["no_edge_platform"] = int(plat["No edge platform"])
+    got["no_specific_platform"] = int(plat["Generic hardware descriptors"] + plat["No hardware reported"])
 
     # ---- RQ4: family x platform matrix
     mat = df.groupby("platform_class")[list(FAMILIES)].sum().reindex(PLATFORMS, fill_value=0)
@@ -135,6 +138,7 @@ def main() -> None:
         ("Distinct journals", got["journals"]),
         ("Journals with a single article", f"{got['single_article_journals']} "
                                            f"({got['single_article_journals'] / got['journals'] * 100:.0f}%)"),
+        ("Share of corpus from single-article journals", f"{got['single_article_journals'] / n * 100:.0f}%"),
         ("Top journals", "; ".join(f"{j.title().replace('Ieee', 'IEEE')} ({c})" for j, c in vc.head(3).items())),
         ("Bradford zones (journals/articles)", "; ".join(f"Z{z}: {s}/{a}" for z, s, a in zones)),
         ("Bradford multipliers", ", ".join(map(str, mult))),
@@ -142,7 +146,7 @@ def main() -> None:
         ("Authors with a single article", f"{dist[1]} ({dist[1] / len(authors) * 100:.1f}%)"),
         ("Studies with zero citations", f"{got['uncited_studies']} ({got['uncited_studies'] / n * 100:.0f}%)"),
         ("Edge platform with physical metrics (Group A)", f"{got['edge_group_a']} ({got['edge_group_a'] / n * 100:.1f}%)"),
-        ("No edge platform identified", f"{got['no_edge_platform']} ({got['no_edge_platform'] / n * 100:.1f}%)"),
+        ("No specific platform identified (QA1 <= 0.5)", f"{got['no_specific_platform']} ({got['no_specific_platform'] / n * 100:.1f}%)"),
     ]
     sdf = pd.DataFrame(summary, columns=["indicator", "value"])
     write_table(sdf, "corpus_summary")
