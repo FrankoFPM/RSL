@@ -1,6 +1,9 @@
 platform_class,Quantization,Pruning / sparsity,Low-rank (LoRA/PEFT),Knowledge distillation
 NVIDIA Jetson,2,3,0,2
-ARM SoC / Raspberry Pi / FPGA SoC,4,0,0,0
-Server FPGA,1,1,0,0
-Desktop/server GPU,7,0,2,1
-No edge platform,28,15,13,11
+ARM SoC / Raspberry Pi,3,0,0,0
+FPGA SoC (ZCU102),1,0,0,0
+Data-center / server FPGA,1,1,0,0
+Desktop / server GPU or SoC,3,0,2,1
+Edge / FPGA (non-qualifying),1,0,0,0
+Generic hardware descriptors,31,14,13,10
+No hardware reported,0,1,0,1

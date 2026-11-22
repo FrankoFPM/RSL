@@ -1,14 +1,15 @@
 | indicator | value |
 |---|---|
 | Studies in corpus | 73 |
-| Publication years | 2024: 8; 2025: 28; 2026: 37 |
-| Distinct journals | 54 |
-| Journals with a single article | 47 (87%) |
+| Publication years | 2024: 8; 2025: 27; 2026: 38 |
+| Distinct journals | 53 |
+| Journals with a single article | 45 (85%) |
+| Share of corpus from single-article journals | 62% |
 | Top journals | IEEE Access (9); IEEE Transactions On Mobile Computing (6); Visual Intelligence (3) |
-| Bradford zones (journals/articles) | Z1: 7/26; Z2: 25/25; Z3: 22/22 |
-| Bradford multipliers | 3.57, 0.88 |
+| Bradford zones (journals/articles) | Z1: 7/26; Z2: 24/25; Z3: 22/22 |
+| Bradford multipliers | 3.43, 0.92 |
 | Unique authors | 371 |
 | Authors with a single article | 355 (95.7%) |
 | Studies with zero citations | 40 (55%) |
 | Edge platform with physical metrics (Group A) | 9 (12.3%) |
-| No edge platform identified | 53 (72.6%) |
+| No specific platform identified (QA1 <= 0.5) | 56 (76.7%) |

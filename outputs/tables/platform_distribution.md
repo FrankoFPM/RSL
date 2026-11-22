@@ -1,7 +1,10 @@
 | platform_class | studies | percent_of_corpus | edge_group_a |
 |---|---|---|---|
 | NVIDIA Jetson | 5 | 6.8 | True |
-| ARM SoC / Raspberry Pi / FPGA SoC | 4 | 5.5 | True |
-| Server FPGA | 2 | 2.7 | False |
-| Desktop/server GPU | 9 | 12.3 | False |
-| No edge platform | 53 | 72.6 | False |
+| ARM SoC / Raspberry Pi | 3 | 4.1 | True |
+| FPGA SoC (ZCU102) | 1 | 1.4 | True |
+| Data-center / server FPGA | 2 | 2.7 | False |
+| Desktop / server GPU or SoC | 4 | 5.5 | False |
+| Edge / FPGA (non-qualifying) | 2 | 2.7 | False |
+| Generic hardware descriptors | 54 | 74.0 | False |
+| No hardware reported | 2 | 2.7 | False |
